@@ -4,6 +4,7 @@ import dataURLtoBlob from "../utils/dataURLtoBlob";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const API_KEY = import.meta.env.VITE_API_KEY;
+const IMAGE_SIZE = +import.meta.env.VITE_IMAGE_SIZE;
 
 type APIResponse = { resultado: string };
 
@@ -40,10 +41,10 @@ export default function PontoEletronico() {
     try {
       // Make image
       const canvas = document.createElement("canvas");
-      canvas.height = 128;
-      canvas.width = 128;
+      canvas.height = IMAGE_SIZE;
+      canvas.width = IMAGE_SIZE;
       const context = canvas.getContext("2d");
-      context?.drawImage(camera, 0, 0, 128, 128);
+      context?.drawImage(camera, 0, 0, IMAGE_SIZE, IMAGE_SIZE);
 
       // Make File image
       const imageURL = canvas.toDataURL("image/jpeg", 1);
