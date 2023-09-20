@@ -7,10 +7,20 @@ const API_KEY = import.meta.env.VITE_API_KEY;
 const IMAGE_SIZE = +import.meta.env.VITE_IMAGE_SIZE;
 
 type APIResponse = { resultado: string };
+type Message = {
+  type: "" | "success" | "error";
+  message: string;
+};
 
 export default function PontoEletronico() {
   const [cpf, setCPF] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+
+  const messageInit: Message = {
+    type: "",
+    message: "",
+  };
+  const [message, setMessage] = useState<Message>(messageInit);
 
   const camera = document.querySelector<HTMLVideoElement>("#camera")!;
 
@@ -38,6 +48,7 @@ export default function PontoEletronico() {
     evt.preventDefault();
     if (cpf.length !== 14) return;
     setLoading(true);
+    setMessage(messageInit);
     try {
       // Make image
       const canvas = document.createElement("canvas");
@@ -84,9 +95,19 @@ export default function PontoEletronico() {
       setCPF("");
       camera.srcObject = null;
       setLoading(false);
+
+      if (data.resultado === "ok") {
+        setMessage({
+          type: "success",
+          message: "Ponto marcado com sucesso.",
+        });
+      }
     } catch (error) {
       setLoading(false);
-      console.log("ERRO");
+      setMessage({
+        type: "error",
+        message: "Ocorreu um erro.",
+      });
       console.error(error);
     }
   };
@@ -111,6 +132,17 @@ export default function PontoEletronico() {
           Ponto Eletrônico
         </h1>
         <div className="flex flex-col items-center p-4">
+          {message.message.length > 0 && (
+            <h2
+              className={`rounded px-2 py-1 ${
+                message.type === "success"
+                  ? "bg-green-400 text-green-900"
+                  : "bg-red-400 text-red-900"
+              }`}
+            >
+              {message.message}
+            </h2>
+          )}
           <img src="/logo192.png" className="w-[130px] py-4" />
           <div className="flex flex-col items-center gap-4">
             <label className="text-xl text-slate-300">Digite o seu CPF</label>
@@ -118,9 +150,6 @@ export default function PontoEletronico() {
               name="cpf"
               type="text"
               value={cpf}
-              minLength={14}
-              maxLength={14}
-              maskPlaceholder={null}
               onChange={handleCPFChange}
               mask="999.999.999-99"
               maskChar={null}
