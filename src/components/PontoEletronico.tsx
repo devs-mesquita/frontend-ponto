@@ -36,8 +36,8 @@ export default function PontoEletronico() {
 
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
+    if (cpf.length !== 14) return;
     setLoading(true);
-
     try {
       // Make image
       const canvas = document.createElement("canvas");
@@ -118,6 +118,9 @@ export default function PontoEletronico() {
               name="cpf"
               type="text"
               value={cpf}
+              minLength={14}
+              maxLength={14}
+              maskPlaceholder={null}
               onChange={handleCPFChange}
               mask="999.999.999-99"
               maskChar={null}
