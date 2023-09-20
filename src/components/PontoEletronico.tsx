@@ -107,7 +107,7 @@ export default function PontoEletronico() {
         onSubmit={handleSubmit}
         className="flex flex-col items-center rounded-lg bg-white/5 shadow-md shadow-black/20"
       >
-        <h1 className="w-full border-b border-white/20 p-3 text-center text-2xl text-slate-300">
+        <h1 className="w-full cursor-default border-b border-white/20 p-3 text-center text-2xl text-slate-300 shadow shadow-black/20">
           Ponto Eletrônico
         </h1>
         <div className="flex flex-col items-center p-4">
@@ -122,13 +122,13 @@ export default function PontoEletronico() {
               mask="999.999.999-99"
               maskChar={null}
               alwaysShowMask={false}
-              className="rounded bg-slate-200 p-2 text-center text-lg text-slate-800 outline-0 disabled:bg-slate-200/40"
+              className="rounded border-2 bg-slate-200 p-1 text-center text-lg text-slate-800 shadow shadow-black/20 outline-0 focus:border-indigo-600/70 disabled:bg-slate-200/40"
               disabled={loading}
               placeholder="000.000.000-00"
               required
             />
             <button
-              className="w-full rounded-lg bg-indigo-500/60 py-2 font-bold text-slate-300 hover:bg-indigo-500/75 disabled:bg-indigo-400/30 hover:disabled:bg-indigo-400/40"
+              className="w-full rounded-lg bg-indigo-500/60 py-2 font-bold text-slate-300 shadow shadow-black/20 hover:bg-indigo-500/75 disabled:bg-indigo-400/30 hover:disabled:bg-indigo-400/40"
               disabled={loading}
             >
               {loading ? "ENVIANDO..." : "ENVIAR"}
