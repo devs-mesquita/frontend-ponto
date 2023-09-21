@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes disappear {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0
+  }
+}
+
+.animate-disappear {
+  animation: disappear 5s ease-in-out forwards;
+}

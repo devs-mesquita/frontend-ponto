@@ -82,10 +82,10 @@ export default function PontoEletronico() {
       const file = new File([blob], "photo.jpg", { type: "image/jpeg" });
 
       // Download for Testing Purposes
-      const anchor = document.createElement("a");
-      anchor.href = imageURL;
-      anchor.download = "ponto-eletronico.png";
-      anchor.click();
+      // const anchor = document.createElement("a");
+      // anchor.href = imageURL;
+      // anchor.download = "ponto-eletronico.png";
+      // anchor.click();
 
       // Make FormData
       const formData = new FormData();
@@ -145,9 +145,9 @@ export default function PontoEletronico() {
           Ponto Eletrônico
         </h1>
         <div className="flex flex-col items-center p-4">
-          {message.message.length > 0 && (
+          {message.message.length > 0 ? (
             <h2
-              className={`max-w-[275px] rounded px-2 py-1 text-center ${
+              className={`animate-disappear max-w-[275px] rounded px-2 py-1 text-center ${
                 message.type === "success"
                   ? "bg-green-400 text-green-900"
                   : message.type === "error"
@@ -159,6 +159,8 @@ export default function PontoEletronico() {
             >
               {message.message}
             </h2>
+          ) : (
+            <div className="h-[32px]" />
           )}
           <img src="/logo192.png" className="w-[130px] py-4" />
           <div className="flex flex-col items-center gap-4">
