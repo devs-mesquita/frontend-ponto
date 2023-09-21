@@ -8,7 +8,7 @@ const IMAGE_SIZE = +import.meta.env.VITE_IMAGE_SIZE;
 
 type APIResponse = { resultado: string };
 type Message = {
-  type: "" | "success" | "error";
+  type: "" | "success" | "error" | "warning";
   message: string;
 };
 
@@ -47,8 +47,10 @@ export default function PontoEletronico() {
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
     if (cpf.length !== 14) return;
+
     setLoading(true);
     setMessage(messageInit);
+
     try {
       // Make image
       const canvas = document.createElement("canvas");
@@ -99,9 +101,22 @@ export default function PontoEletronico() {
       if (data.resultado === "ok") {
         setMessage({
           type: "success",
-          message: "Ponto marcado com sucesso.",
+          message: "Ponto registraddo com sucesso.",
+        });
+
+      } else if (data.resultado === "timeout") {
+        setMessage({
+          type: "warning",
+          message: "Um ponto já foi registrado nos últimos 30 minutos.",
+        });
+
+      } else if (data.resultado === "complete") {
+        setMessage({
+          type: "warning",
+          message: "Todos os pontos do dia já foram marcados.",
         });
       }
+
     } catch (error) {
       setLoading(false);
       setMessage({
@@ -110,6 +125,10 @@ export default function PontoEletronico() {
       });
       console.error(error);
     }
+
+    setTimeout(() => {
+      setMessage(messageInit);
+    }, 5000)
   };
 
   return (
@@ -134,11 +153,10 @@ export default function PontoEletronico() {
         <div className="flex flex-col items-center p-4">
           {message.message.length > 0 && (
             <h2
-              className={`rounded px-2 py-1 ${
-                message.type === "success"
-                  ? "bg-green-400 text-green-900"
-                  : "bg-red-400 text-red-900"
-              }`}
+              className={`rounded max-w-[275px] text-center px-2 py-1 ${message.type === "success" ? "bg-green-400 text-green-900" :
+                  message.type === "error" ? "bg-red-400 text-red-900" :
+                    message.type === "warning" ? "bg-yellow-300 text-yellow-900" :
+                      ""}`}
             >
               {message.message}
             </h2>
