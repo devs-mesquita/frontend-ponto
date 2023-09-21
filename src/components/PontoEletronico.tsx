@@ -92,9 +92,8 @@ export default function PontoEletronico() {
       formData.append("cpf", cpf);
       formData.append("img", file);
 
-      const cpfClean = cpf.replace("-", "").replace(".", "").replace(".", "");
-
       // Send to API.
+      const cpfClean = cpf.replace("-", "").replace(".", "").replace(".", "");
       const result = await fetch(`${API_URL}/api/registro/${cpfClean}`, {
         method: "POST",
         body: formData,
