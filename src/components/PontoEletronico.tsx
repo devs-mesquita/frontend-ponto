@@ -164,6 +164,7 @@ export default function PontoEletronico() {
           <div className="flex flex-col items-center gap-4">
             <label className="text-xl text-slate-300">Digite o seu CPF</label>
             <InputMask
+              autoComplete="off"
               name="cpf"
               type="text"
               value={cpf}
