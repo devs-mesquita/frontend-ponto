@@ -114,6 +114,7 @@ export default function PontoEletronico() {
       setLoading(false);
 
       setMessage(messages[resultado]);
+      
     } catch (error) {
       setLoading(false);
       setMessage(messages["error"]);
