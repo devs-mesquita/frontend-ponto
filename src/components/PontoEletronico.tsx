@@ -6,11 +6,30 @@ const API_URL = import.meta.env.VITE_API_URL;
 const API_KEY = import.meta.env.VITE_API_KEY;
 const IMAGE_SIZE = +import.meta.env.VITE_IMAGE_SIZE;
 
-type APIResponse = { resultado: string };
 type Message = {
   type: "" | "success" | "error" | "warning";
   message: string;
 };
+
+type APIResponse = { resultado: "ok" | "timeout" | "complete" };
+const messages = {
+  ok: {
+    type: "success",
+    message: "Ponto registrado com sucesso.",
+  },
+  timeout: {
+    type: "warning",
+    message: "Um ponto já foi registrado nos últimos 30 minutos.",
+  },
+  complete: {
+    type: "warning",
+    message: "Todos os pontos do dia já foram marcados.",
+  },
+  error: {
+    type: "error",
+    message: "Ocorreu um erro.",
+  },
+} as const;
 
 export default function PontoEletronico() {
   const [cpf, setCPF] = useState<string>("");
@@ -41,8 +60,6 @@ export default function PontoEletronico() {
       camera.srcObject = null;
     }
   };
-
-  console.log(API_URL);
 
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
@@ -91,44 +108,22 @@ export default function PontoEletronico() {
         throw new Error(err);
       }
 
-      const data: APIResponse = await result.json();
-      console.log(data.resultado);
+      const { resultado }: APIResponse = await result.json();
 
       setCPF("");
       camera.srcObject = null;
       setLoading(false);
 
-      if (data.resultado === "ok") {
-        setMessage({
-          type: "success",
-          message: "Ponto registraddo com sucesso.",
-        });
-
-      } else if (data.resultado === "timeout") {
-        setMessage({
-          type: "warning",
-          message: "Um ponto já foi registrado nos últimos 30 minutos.",
-        });
-
-      } else if (data.resultado === "complete") {
-        setMessage({
-          type: "warning",
-          message: "Todos os pontos do dia já foram marcados.",
-        });
-      }
-
+      setMessage(messages[resultado]);
     } catch (error) {
       setLoading(false);
-      setMessage({
-        type: "error",
-        message: "Ocorreu um erro.",
-      });
+      setMessage(messages["error"]);
       console.error(error);
     }
 
     setTimeout(() => {
       setMessage(messageInit);
-    }, 5000)
+    }, 5000);
   };
 
   return (
@@ -153,10 +148,15 @@ export default function PontoEletronico() {
         <div className="flex flex-col items-center p-4">
           {message.message.length > 0 && (
             <h2
-              className={`rounded max-w-[275px] text-center px-2 py-1 ${message.type === "success" ? "bg-green-400 text-green-900" :
-                  message.type === "error" ? "bg-red-400 text-red-900" :
-                    message.type === "warning" ? "bg-yellow-300 text-yellow-900" :
-                      ""}`}
+              className={`max-w-[275px] rounded px-2 py-1 text-center ${
+                message.type === "success"
+                  ? "bg-green-400 text-green-900"
+                  : message.type === "error"
+                  ? "bg-red-400 text-red-900"
+                  : message.type === "warning"
+                  ? "bg-yellow-300 text-yellow-900"
+                  : ""
+              }`}
             >
               {message.message}
             </h2>
