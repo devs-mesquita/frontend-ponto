@@ -56,7 +56,12 @@ export default function PontoEletronico() {
       });
       camera.srcObject = stream;
       camera.play();
+      
     } else if (evt.target.value.length === 0) {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+      });
+      stream.getTracks()[0].stop();
       camera.srcObject = null;
     }
   };
