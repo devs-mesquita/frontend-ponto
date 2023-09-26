@@ -11,8 +11,12 @@ type Message = {
   message: string;
 };
 
-type APIResponse = { resultado: "ok" | "timeout" | "complete" };
-const messages = {
+type Ponto = "entrada" | "inicio-intervalo" | "fim-intervalo" | "saida";
+type APIResponse = {
+  resultado: "ok" | "timeout" | "complete";
+  tipo: Ponto;
+};
+const results = {
   ok: {
     type: "success",
     message: "Ponto registrado com sucesso.",
@@ -29,6 +33,13 @@ const messages = {
     type: "error",
     message: "Ocorreu um erro.",
   },
+} as const;
+
+const messages = {
+  entrada: "Horário de entrada registrado com sucesso.",
+  "inicio-intervalo": "Início de intervalo registrado com sucesso.",
+  "fim-intervalo": "Fim de intervalo registrado com sucesso.",
+  saida: "Horário de saída registrado com sucesso.",
 } as const;
 
 export default function PontoEletronico() {
@@ -56,7 +67,6 @@ export default function PontoEletronico() {
       });
       camera.srcObject = stream;
       camera.play();
-      
     } else if (evt.target.value.length === 0) {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
@@ -112,23 +122,29 @@ export default function PontoEletronico() {
         throw new Error(err);
       }
 
-      const { resultado }: APIResponse = await result.json();
+      const res: APIResponse = await result.json();
 
       setCPF("");
       camera.srcObject = null;
       setLoading(false);
 
-      setMessage(messages[resultado]);
-      
+      if (res.resultado === "ok") {
+        setMessage({
+          ...results[res.resultado],
+          message: messages[res.tipo],
+        });
+      } else {
+        setMessage(results[res.resultado]);
+      }
     } catch (error) {
       setLoading(false);
-      setMessage(messages["error"]);
+      setMessage(results["error"]);
       console.error(error);
     }
 
     setTimeout(() => {
       setMessage(messageInit);
-    }, 5000);
+    }, 6000);
   };
 
   return (
@@ -151,7 +167,7 @@ export default function PontoEletronico() {
           Ponto Eletrônico
         </h1>
         <div className="flex flex-col items-center p-4">
-          {message.message.length > 0 ? (
+          {message.message.length > 0 && (
             <h2
               className={`animate-disappear max-w-[275px] rounded px-2 py-1 text-center ${
                 message.type === "success"
@@ -165,8 +181,6 @@ export default function PontoEletronico() {
             >
               {message.message}
             </h2>
-          ) : (
-            <div className="h-[32px]" />
           )}
           <img src="/logo192.png" className="w-[130px] py-4" />
           <div className="flex flex-col items-center gap-4">
