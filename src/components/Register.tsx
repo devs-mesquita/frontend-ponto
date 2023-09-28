@@ -54,7 +54,10 @@ export default function Register() {
 
       const res = await fetch(`${API_URL}/api/register`, {
         method: "POST",
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          cpf: form.cpf.replace("-", "").replace(".", "").replace(".", ""),
+        }),
         headers: {
           "Content-Type": "application/json",
         },
@@ -68,7 +71,6 @@ export default function Register() {
       const data: RegisterAPIResponse = await res.json();
       setMessage(results[data.resultado]);
       setForm(formInit);
-
     } catch (error: any) {
       setMessage({
         message: "Ocorreu um erro.",
