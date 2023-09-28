@@ -10,22 +10,36 @@ export default function Navbar() {
   };
 
   return (
-    <header className="flex items-center border-b border-white/20 px-4 py-2 shadow shadow-black/20 md:px-8 md:py-4">
+    <header className="flex items-center gap-8 border-b border-white/20 px-4 py-2 shadow shadow-black/20 md:px-8 md:py-4">
       <NavLink
         to="/"
         className={({ isActive }) =>
-          `${isActive ? "text-white" : "text-slate-300"} text-xl`
+          `${
+            isActive ? "text-white" : "text-white/60 hover:text-white/80"
+          } text-xl`
         }
       >
         Ponto Eletrônico
       </NavLink>
       {isAuthenticated() ? (
-        <button
-          className="ml-auto rounded bg-slate-500/40 bg-gradient-to-r px-4 py-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20"
-          onClick={handleSignOut}
-        >
-          Sair
-        </button>
+        <>
+          <NavLink
+            to="/register"
+            className={({ isActive }) =>
+              `${
+                isActive ? "text-white" : "text-white/60 hover:text-white/80"
+              } ml-auto`
+            }
+          >
+            Registrar
+          </NavLink>
+          <button
+            className="rounded bg-slate-500/40 bg-gradient-to-r px-4 py-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white"
+            onClick={handleSignOut}
+          >
+            Sair
+          </button>
+        </>
       ) : (
         <NavLink
           to="/login"

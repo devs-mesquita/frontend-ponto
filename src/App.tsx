@@ -1,9 +1,11 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { RequireAuth } from "react-auth-kit";
+
+import Layout from "./components/Layout";
 import PontoEletronico from "./components/PontoEletronico";
 import Login from "./components/Login";
+import Register from "./components/Register";
 import Home from "./components/Home";
-import Layout from "./components/Layout";
 import NotFound from "./components/NotFound";
 
 export default function App() {
@@ -12,12 +14,20 @@ export default function App() {
       <Routes>
         <Route path="/ponto" element={<PontoEletronico />} />
         <Route path="/" element={<Layout />}>
-          <Route path="/login" element={<Login />} />
           <Route
             index
             element={
               <RequireAuth loginPath="/login">
                 <Home />
+              </RequireAuth>
+            }
+          />
+          <Route path="login" element={<Login />} />
+          <Route
+            path="register"
+            element={
+              <RequireAuth loginPath="/login">
+                <Register />
               </RequireAuth>
             }
           />
