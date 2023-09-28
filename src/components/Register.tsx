@@ -68,7 +68,7 @@ export default function Register() {
       const data: RegisterAPIResponse = await res.json();
       setMessage(results[data.resultado]);
       setForm(formInit);
-      
+      setLoading(false);
     } catch (error: any) {
       setMessage({
         message: "Ocorreu um erro.",
@@ -90,7 +90,7 @@ export default function Register() {
         <img src="/logo192.png" className="w-[130px] py-4" />
         {message.message.length > 0 && (
           <h2
-            className={`max-w-[275px] rounded px-2 py-1 my-2 text-center ${
+            className={`my-2 max-w-[275px] rounded px-2 py-1 text-center ${
               message.type === "success"
                 ? "bg-green-400 text-green-900"
                 : message.type === "error"
