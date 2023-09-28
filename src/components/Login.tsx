@@ -76,7 +76,7 @@ export default function Login() {
         authState: { user: data.user },
       });
 
-      navigate("/home");
+      navigate("/");
     } catch (error: any) {
       console.log(error.message);
 
@@ -96,11 +96,11 @@ export default function Login() {
   };
 
   return isAuthenticated() ? (
-    <Navigate to="/home" />
+    <Navigate to="/" />
   ) : (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col items-center rounded-lg bg-white/5 shadow-md shadow-black/20"
+      className="flex flex-col items-center rounded-lg bg-white/5 shadow-md shadow-black/20 m-auto"
     >
       <h1 className="w-full cursor-default border-b border-white/20 p-3 text-center text-2xl text-slate-300 shadow shadow-black/20">
         Login

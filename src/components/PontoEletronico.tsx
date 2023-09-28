@@ -157,7 +157,7 @@ export default function PontoEletronico() {
   };
 
   return (
-    <div className="flex flex-1 flex-col justify-center gap-6">
+    <div className="flex flex-1 flex-col justify-center gap-6 m-auto">
       <div className="rounded-lg bg-white/5 p-2 shadow-md shadow-black/20">
         <div className="h-[300px] w-[300px] overflow-hidden">
           <video
