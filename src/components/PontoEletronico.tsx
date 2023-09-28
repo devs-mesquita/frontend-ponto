@@ -12,8 +12,9 @@ type Message = {
 };
 
 type Ponto = "entrada" | "inicio-intervalo" | "fim-intervalo" | "saida";
+type Resultado = "ok" | "timeout" | "complete" | "invalid_cpf";
 type APIResponse = {
-  resultado: "ok" | "timeout" | "complete";
+  resultado: Resultado;
   tipo: Ponto;
 };
 const results = {
@@ -24,6 +25,10 @@ const results = {
   timeout: {
     type: "warning",
     message: "Um ponto já foi registrado nos últimos 30 minutos.",
+  },
+  invalid_cpf: {
+    type: "error",
+    message: "CPF inválido.",
   },
   complete: {
     type: "warning",
@@ -119,7 +124,7 @@ export default function PontoEletronico() {
 
       if (!result.ok) {
         const err = await result.json();
-        throw new Error(err);
+        throw err;
       }
 
       const res: APIResponse = await result.json();
@@ -136,15 +141,19 @@ export default function PontoEletronico() {
       } else {
         setMessage(results[res.resultado]);
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error instanceof Error) {
+        setMessage(results["error"]);
+      } else if (error.resultado) {
+        const resultado = error.resultado as Resultado;
+        setMessage(results[resultado]);
+      }
       setLoading(false);
-      setMessage(results["error"]);
-      console.error(error);
     }
 
     setTimeout(() => {
       setMessage(messageInit);
-    }, 6000);
+    }, 5000);
   };
 
   return (

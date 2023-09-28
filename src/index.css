@@ -12,5 +12,5 @@
 }
 
 .animate-disappear {
-  animation: disappear 6s ease-in-out forwards;
+  animation: disappear 5s ease-in-out forwards;
 }

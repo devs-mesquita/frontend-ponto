@@ -78,7 +78,9 @@ export default function Login() {
 
       navigate("/home");
     } catch (error: any) {
-      if (error?.status && error.status === 401) {
+      console.log(error.message);
+
+      if (error.message === "Unauthorized") {
         setMessage({
           message: "Credenciais inválidas.",
           type: "error",
