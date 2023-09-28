@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { asyncPause } from "../utils/asyncPause";
 import InputMask from "react-input-mask";
 
 type Message = {
@@ -33,7 +32,7 @@ export default function Register() {
   };
   const [message, setMessage] = useState<Message>(messageInit);
 
-  const formInit = { email: "", cpf: "", password: "", name: "" };
+  const formInit = { email: "", cpf: "", name: "" };
   const [form, setForm] = useState(formInit);
 
   const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,8 +49,6 @@ export default function Register() {
     if (form.cpf.length !== 14) return;
 
     try {
-      await asyncPause(3000);
-
       const res = await fetch(`${API_URL}/api/register`, {
         method: "POST",
         body: JSON.stringify({

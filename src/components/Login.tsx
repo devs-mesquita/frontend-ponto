@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { asyncPause } from "../utils/asyncPause";
 import { useSignIn, useIsAuthenticated } from "react-auth-kit";
 import { useNavigate, Navigate } from "react-router-dom";
 
@@ -52,8 +51,6 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await asyncPause(3000);
-
       const res = await fetch(`${API_URL}/api/login`, {
         method: "POST",
         body: JSON.stringify(form),
