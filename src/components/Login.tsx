@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useSignIn } from "react-auth-kit";
 import { asyncPause } from "../utils/asyncPause";
-import { redirect } from "react-router-dom";
+import { useSignIn, useIsAuthenticated } from "react-auth-kit";
+import { useNavigate, Navigate } from "react-router-dom";
 
 type Message = {
   type: "" | "success" | "error" | "warning";
@@ -9,20 +9,30 @@ type Message = {
 };
 
 type LoginAPIResponse = {
-  token: any;
-  expiresIn: any;
-  user: any;
+  authorization: {
+    token: string;
+    type: string;
+    expiresIn?: number;
+  };
+  user: {
+    name: string;
+    cpf: string;
+    email: string;
+  };
 };
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Login() {
+  const isAuthenticated = useIsAuthenticated();
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState<boolean>(false);
   const signIn = useSignIn();
 
   const messageInit: Message = {
-    type: "",
     message: "",
+    type: "",
   };
   const [message, setMessage] = useState<Message>(messageInit);
 
@@ -43,37 +53,49 @@ export default function Login() {
 
     try {
       await asyncPause(3000);
+
       const res = await fetch(`${API_URL}/api/login`, {
         method: "POST",
         body: JSON.stringify(form),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err);
+        throw err;
       }
 
       const data: LoginAPIResponse = await res.json();
 
       signIn({
-        token: data.token,
+        token: data.authorization.token,
         tokenType: "Bearer",
-        expiresIn: data.expiresIn,
-        authState: data.user,
+        expiresIn: 3600,
+        authState: { user: data.user },
       });
 
-      return redirect("/home");
-    } catch (error) {
-      setMessage({
-        message: "Ocorreu um erro.",
-        type: "error",
-      });
+      navigate("/home");
+    } catch (error: any) {
+      if (error?.status && error.status === 401) {
+        setMessage({
+          message: "Credenciais inválidas.",
+          type: "error",
+        });
+      } else {
+        setMessage({
+          message: "Ocorreu um erro.",
+          type: "error",
+        });
+      }
       setLoading(false);
-      console.log(error);
     }
   };
 
-  return (
+  return isAuthenticated() ? (
+    <Navigate to="/home" />
+  ) : (
     <form
       onSubmit={handleSubmit}
       className="flex flex-col items-center rounded-lg bg-white/5 shadow-md shadow-black/20"
@@ -82,9 +104,10 @@ export default function Login() {
         Login
       </h1>
       <div className="flex flex-col items-center p-4">
+        <img src="/logo192.png" className="w-[130px] py-4" />
         {message.message.length > 0 && (
           <h2
-            className={`animate-disappear max-w-[275px] rounded px-2 py-1 text-center ${
+            className={`max-w-[275px] rounded px-2 py-1 text-center ${
               message.type === "success"
                 ? "bg-green-400 text-green-900"
                 : message.type === "error"
@@ -97,7 +120,6 @@ export default function Login() {
             {message.message}
           </h2>
         )}
-        <img src="/logo192.png" className="w-[130px] py-4" />
         <div className="flex min-w-[20rem] flex-col items-center gap-4">
           <div className="flex w-full flex-col gap-1">
             <label className="text-slate-300" htmlFor="email">

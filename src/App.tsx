@@ -1,6 +1,8 @@
 import { Routes, Route } from "react-router-dom";
+import { RequireAuth } from "react-auth-kit";
 import PontoEletronico from "./components/PontoEletronico";
 import Login from "./components/Login";
+import Home from "./components/Home";
 
 export default function App() {
   return (
@@ -8,6 +10,14 @@ export default function App() {
       <Routes>
         <Route path="/" element={<PontoEletronico />} />
         <Route path="/login" element={<Login />} />
+        <Route
+          path="/home"
+          element={
+            <RequireAuth loginPath="/login">
+              <Home />
+            </RequireAuth>
+          }
+        />
       </Routes>
     </div>
   );
