@@ -48,6 +48,8 @@ const messages = {
 } as const;
 
 export default function PontoEletronico() {
+  document.title = "Ponto Eletrônico";
+  
   const [cpf, setCPF] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 

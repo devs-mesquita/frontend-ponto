@@ -1,6 +1,8 @@
 import { useAuthUser } from "react-auth-kit";
 
 export default function Home() {
+  document.title = "Ponto Eletrônico";
+
   const auth = useAuthUser();
 
   return (

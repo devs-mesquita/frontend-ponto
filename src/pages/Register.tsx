@@ -16,7 +16,7 @@ type RegisterAPIResponse = {
 };
 const results = {
   created: {
-    message: "Usuário criado com sucesso.",
+    message: "Usuário registrado com sucesso.",
     type: "success",
   },
 } as const;
@@ -24,6 +24,8 @@ const results = {
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Register() {
+  document.title = "Registrar Usuário";
+  
   const [loading, setLoading] = useState<boolean>(false);
 
   const messageInit: Message = {
@@ -185,7 +187,7 @@ export default function Register() {
               className=" w-full rounded-lg bg-indigo-500/60 py-2 font-bold text-slate-300 shadow shadow-black/20 hover:bg-indigo-500/75 disabled:bg-indigo-400/30 hover:disabled:bg-indigo-400/40"
               disabled={loading}
             >
-              {loading ? "CARREGANDO..." : "ENTRAR"}
+              {loading ? "CARREGANDO..." : "REGISTRAR"}
             </button>
           </div>
         </div>
