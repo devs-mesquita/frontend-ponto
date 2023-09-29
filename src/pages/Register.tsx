@@ -47,13 +47,17 @@ export default function Register() {
     setMessage(messageInit);
     setLoading(true);
     if (form.cpf.length !== 14) return;
+    const cleanCPF = form.cpf
+      .replace("-", "")
+      .replace(".", "")
+      .replace(".", "");
 
     try {
       const res = await fetch(`${API_URL}/api/register`, {
         method: "POST",
         body: JSON.stringify({
           ...form,
-          cpf: form.cpf.replace("-", "").replace(".", "").replace(".", ""),
+          cpf: cleanCPF,
         }),
         headers: {
           "Content-Type": "application/json",

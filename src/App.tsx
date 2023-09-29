@@ -2,11 +2,11 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { RequireAuth } from "react-auth-kit";
 
 import Layout from "./components/Layout";
-import PontoEletronico from "./components/PontoEletronico";
-import Login from "./components/Login";
-import Register from "./components/Register";
-import Home from "./components/Home";
-import NotFound from "./components/NotFound";
+import PontoEletronico from "./pages/PontoEletronico";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Home from "./pages/Home";
+import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (

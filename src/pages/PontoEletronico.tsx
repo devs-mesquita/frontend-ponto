@@ -109,12 +109,12 @@ export default function PontoEletronico() {
 
       // Make FormData
       const formData = new FormData();
-      formData.append("cpf", cpf);
+      const cleanCPF = cpf.replace("-", "").replace(".", "").replace(".", "");
+      formData.append("cpf", cleanCPF);
       formData.append("img", file);
 
       // Send to API.
-      const cpfClean = cpf.replace("-", "").replace(".", "").replace(".", "");
-      const result = await fetch(`${API_URL}/api/registro/${cpfClean}`, {
+      const result = await fetch(`${API_URL}/api/registro`, {
         method: "POST",
         body: formData,
         headers: {
@@ -157,7 +157,7 @@ export default function PontoEletronico() {
   };
 
   return (
-    <div className="flex flex-1 flex-col justify-center gap-6 m-auto">
+    <div className="m-auto flex flex-1 flex-col justify-center gap-6">
       <div className="rounded-lg bg-white/5 p-2 shadow-md shadow-black/20">
         <div className="h-[300px] w-[300px] overflow-hidden">
           <video
