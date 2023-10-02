@@ -12,7 +12,7 @@ type Message = {
 };
 
 type Ponto = "entrada" | "inicio-intervalo" | "fim-intervalo" | "saida";
-type Resultado = "ok" | "timeout" | "complete" | "invalid_cpf";
+type Resultado = "ok" | "timeout" | "complete" | "invalid-cpf";
 type APIResponse = {
   resultado: Resultado;
   tipo: Ponto;
@@ -26,7 +26,7 @@ const results = {
     type: "warning",
     message: "Um ponto já foi registrado nos últimos 30 minutos.",
   },
-  invalid_cpf: {
+  "invalid-cpf": {
     type: "error",
     message: "CPF inválido.",
   },
@@ -144,6 +144,8 @@ export default function PontoEletronico() {
         setMessage(results[res.resultado]);
       }
     } catch (error: any) {
+      console.log(error);
+
       if (error instanceof Error) {
         setMessage(results["error"]);
       } else if (error.resultado) {
