@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuthUser } from "react-auth-kit";
 import InputMask from "react-input-mask";
 
 type Message = {
@@ -25,6 +26,8 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Register() {
   document.title = "Registrar Usuário";
+
+  const auth = useAuthUser();
   
   const [loading, setLoading] = useState<boolean>(false);
 

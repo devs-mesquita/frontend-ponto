@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useAuthUser } from "react-auth-kit";
+import { Navigate } from "react-router-dom";
 import InputMask from "react-input-mask";
 import dataURLtoBlob from "../utils/dataURLtoBlob";
 
@@ -49,6 +51,8 @@ const messages = {
 
 export default function PontoEletronico() {
   document.title = "Ponto Eletrônico";
+
+  const auth = useAuthUser();
   
   const [cpf, setCPF] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -160,7 +164,7 @@ export default function PontoEletronico() {
     }, 5000);
   };
 
-  return (
+  return auth()?.user.setor === "PONTO" ? (
     <div className="m-auto flex flex-1 flex-col justify-center gap-6">
       <div className="rounded-lg bg-white/5 p-2 shadow-md shadow-black/20">
         <div className="h-[300px] w-[300px] overflow-hidden">
@@ -222,5 +226,5 @@ export default function PontoEletronico() {
         </div>
       </form>
     </div>
-  );
+  ) : <Navigate to="/" />;
 }

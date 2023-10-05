@@ -12,7 +12,6 @@ export default function App() {
   return (
     <div className="flex min-h-screen flex-col bg-slate-800 bg-gradient-to-br from-indigo-700/20 to-rose-600/20">
       <Routes>
-        <Route path="/ponto" element={<PontoEletronico />} />
         <Route path="/" element={<Layout />}>
           <Route
             index
@@ -23,6 +22,14 @@ export default function App() {
             }
           />
           <Route path="login" element={<Login />} />
+          <Route
+            path="ponto"
+            element={
+              <RequireAuth loginPath="/login">
+                <PontoEletronico />
+              </RequireAuth>
+            }
+          />
           <Route
             path="register"
             element={
