@@ -71,7 +71,7 @@ export default function Login() {
       signIn({
         token: data.authorization.token,
         tokenType: "Bearer",
-        expiresIn: 3600,
+        expiresIn: 60 * 60 * 24 * 365.25,
         authState: { user: data.user },
       });
 
