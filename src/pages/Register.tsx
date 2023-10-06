@@ -1,7 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuthUser } from "react-auth-kit";
 import InputMask from "react-input-mask";
+import { Navigate } from "react-router-dom";
 
+type Setor = {
+  id: number;
+  nome: string;
+  soma_entrada: number;
+  soma_saida: number;
+};
 type Message = {
   type: "" | "success" | "error" | "warning";
   message: string;
@@ -28,7 +35,7 @@ export default function Register() {
   document.title = "Registrar Usuário";
 
   const auth = useAuthUser();
-  
+
   const [loading, setLoading] = useState<boolean>(false);
 
   const messageInit: Message = {
@@ -37,10 +44,12 @@ export default function Register() {
   };
   const [message, setMessage] = useState<Message>(messageInit);
 
-  const formInit = { email: "", cpf: "", name: "" };
+  const formInit = { email: "", cpf: "", name: "", setor_id: "", nivel: "" };
   const [form, setForm] = useState(formInit);
 
-  const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    evt: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     setForm((st) => ({
       ...st,
       [evt.target.name]: evt.target.value,
@@ -78,7 +87,7 @@ export default function Register() {
       setMessage(results[data.resultado]);
       setForm(formInit);
       setLoading(false);
-    } catch (error: any) {
+    } catch (error) {
       setMessage({
         message: "Ocorreu um erro.",
         type: "error",
@@ -87,10 +96,32 @@ export default function Register() {
     }
   };
 
-  return (
+  const [setores, setSetores] = useState<Setor[]>([]);
+
+  useEffect(() => {
+    const getSetores = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/setores`);
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw err;
+        }
+
+        const data: { setores: Setor[] } = await res.json();
+        setSetores(data.setores);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    getSetores();
+  }, []);
+
+  return ["Super-Admin", "Admin"].includes(auth()?.user.nivel || "") ? (
     <form
       onSubmit={handleSubmit}
-      className="m-auto flex flex-col items-center rounded-lg bg-white/5 shadow-md shadow-black/20"
+      className="m-auto my-4 flex flex-col items-center rounded-lg bg-white/5 shadow-md shadow-black/20"
     >
       <h1 className="w-full cursor-default border-b border-white/20 p-3 text-center text-2xl text-slate-300 shadow shadow-black/20">
         Registro
@@ -166,22 +197,56 @@ export default function Register() {
                 required
               />
             </div>
-            {/* <div className="flex w-full flex-col gap-1">
-              <label className="text-slate-300" htmlFor="password">
-                Senha:
+            <div className="flex w-full flex-col gap-1">
+              <label className="text-slate-300" htmlFor="setor">
+                Setor
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                value={form.password}
+              <select
+                id="setor"
+                name="setor_id"
+                value={form.setor_id}
                 onChange={handleChange}
                 className="w-full rounded border-2 bg-slate-200 py-1 text-center text-lg text-slate-800 shadow shadow-black/20 outline-0 focus:border-indigo-600/70 disabled:bg-slate-200/40"
                 disabled={loading}
-                placeholder="&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;"
                 required
-              />
-            </div> */}
+              >
+                {auth()?.user.nivel === "Super-Admin" ? (
+                  <>
+                    <option value="">Selecione um setor</option>
+                    {setores.map((setor) => (
+                      <option key={crypto.randomUUID()} value={setor.id}>
+                        {setor.nome}
+                      </option>
+                    ))}
+                  </>
+                ) : (
+                  <option value={auth()?.user.setor.id}>
+                    {auth()?.user.setor.nome}
+                  </option>
+                )}
+              </select>
+            </div>
+            <div className="flex w-full flex-col gap-1">
+              <label className="text-slate-300" htmlFor="nivel">
+                Nível
+              </label>
+              <select
+                id="nivel"
+                name="nivel"
+                value={form.nivel}
+                onChange={handleChange}
+                className="w-full rounded border-2 bg-slate-200 py-1 text-center text-lg text-slate-800 shadow shadow-black/20 outline-0 focus:border-indigo-600/70 disabled:bg-slate-200/40"
+                disabled={loading}
+                required
+              >
+                <option value="">Selecione um nível</option>
+                {auth()?.user.nivel === "Super-Admin" && (
+                  <option value="Super-Admin">Super Administrador</option>
+                )}
+                <option value="Admin">Administrador</option>
+                <option value="User">Usuário</option>
+              </select>
+            </div>
           </div>
           <div className="w-full border-b border-white/20 shadow shadow-black/20"></div>
           <div className="w-full px-4 pb-4">
@@ -196,5 +261,7 @@ export default function Register() {
         </div>
       </div>
     </form>
+  ) : (
+    <Navigate to="/" />
   );
 }

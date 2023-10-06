@@ -24,7 +24,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Login() {
   document.title = "Login";
-  
+
   const isAuthenticated = useIsAuthenticated();
   const navigate = useNavigate();
 
@@ -76,19 +76,19 @@ export default function Login() {
       });
 
       navigate("/");
-    } catch (error: any) {
-      console.log(error.message);
-
-      if (error.message === "Unauthorized") {
-        setMessage({
-          message: "Credenciais inválidas.",
-          type: "error",
-        });
-      } else {
-        setMessage({
-          message: "Ocorreu um erro.",
-          type: "error",
-        });
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === "Unauthorized") {
+          setMessage({
+            message: "Credenciais inválidas.",
+            type: "error",
+          });
+        } else {
+          setMessage({
+            message: "Ocorreu um erro.",
+            type: "error",
+          });
+        }
       }
       setLoading(false);
     }
@@ -99,7 +99,7 @@ export default function Login() {
   ) : (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col items-center rounded-lg bg-white/5 shadow-md shadow-black/20 m-auto"
+      className="m-auto flex flex-col items-center rounded-lg bg-white/5 shadow-md shadow-black/20"
     >
       <h1 className="w-full cursor-default border-b border-white/20 p-3 text-center text-2xl text-slate-300 shadow shadow-black/20">
         Login

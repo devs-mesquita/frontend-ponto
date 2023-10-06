@@ -3,6 +3,7 @@ import { useAuthUser } from "react-auth-kit";
 import { Navigate } from "react-router-dom";
 import InputMask from "react-input-mask";
 import dataURLtoBlob from "../utils/dataURLtoBlob";
+import errorFromApi from "../utils/errorFromAPI";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const API_KEY = import.meta.env.VITE_API_KEY;
@@ -53,7 +54,7 @@ export default function PontoEletronico() {
   document.title = "Ponto Eletrônico";
 
   const auth = useAuthUser();
-  
+
   const [cpf, setCPF] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -147,15 +148,16 @@ export default function PontoEletronico() {
       } else {
         setMessage(results[res.resultado]);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
 
       if (error instanceof Error) {
         setMessage(results["error"]);
-      } else if (error.resultado) {
+      } else if (errorFromApi<{ resultado: Resultado }>(error, "resultado")) {
         const resultado = error.resultado as Resultado;
         setMessage(results[resultado]);
       }
+
       setLoading(false);
     }
 
@@ -164,8 +166,8 @@ export default function PontoEletronico() {
     }, 5000);
   };
 
-  return auth()?.user.setor === "PONTO" ? (
-    <div className="m-auto flex flex-1 flex-col justify-center gap-6">
+  return auth()?.user.setor.nome === "PONTO" ? (
+    <div className="m-auto my-4 flex flex-1 flex-col justify-center gap-6">
       <div className="rounded-lg bg-white/5 p-2 shadow-md shadow-black/20">
         <div className="h-[300px] w-[300px] overflow-hidden">
           <video
@@ -226,5 +228,7 @@ export default function PontoEletronico() {
         </div>
       </form>
     </div>
-  ) : <Navigate to="/" />;
+  ) : (
+    <Navigate to="/" />
+  );
 }
