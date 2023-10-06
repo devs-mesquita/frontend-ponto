@@ -24,7 +24,7 @@ export default function Navbar() {
       </NavLink>
       {isAuthenticated() ? (
         <div className="ml-auto flex items-center gap-8">
-          {["Super-Admin", "Admin"].includes(auth()?.user.nivel) && (
+          {["Super-Admin", "Admin"].includes(auth()?.user.nivel || "") && (
             <NavLink
               to="/register"
               className={({ isActive }) =>
