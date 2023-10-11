@@ -14,6 +14,28 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+type Registro = {
+  id: number;
+  cpf: string;
+  tipo:
+    | "entrada"
+    | "inicio-intervalo"
+    | "fim-intervalo"
+    | "saida"
+    | "falta"
+    | "atestado"
+    | "ferias"
+    | "feriado"
+    | "facultativo";
+  data_hora: string;
+};
+
+type RegistroAPIResponse = {
+  registros: Registro[];
+};
+
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Home() {
   document.title = "Ponto Eletrônico";
   const auth = useAuthUser();
@@ -23,12 +45,52 @@ export default function Home() {
     to: undefined, //addDays(new Date(), 30),
   });
 
+  const [loading, setLoading] = React.useState<boolean>(false);
+
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
-
     if (date?.from && date.to && auth()?.user.cpf) {
-      console.log("Sent !");
-      console.log(date, auth()?.user.cpf);
+      setLoading(true);
+      try {
+        const res = await fetch(
+          `${API_URL}/api/registro?` +
+            new URLSearchParams({
+              from: date.from.toDateString(),
+              to: date.to.toDateString(),
+              cpf: auth()?.user.cpf || "",
+            }),
+        );
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw err;
+        }
+
+        const data: RegistroAPIResponse = await res.json();
+        console.log(data);
+        setLoading(false);
+
+        const registros = data.registros;
+
+        const registrosTable = registros.reduce(
+          (lista, registro) => {
+            const dateKey = registro.data_hora.split(" ")[0].trim();
+
+            return {
+              ...lista,
+              [dateKey]: {
+                ...lista[dateKey],
+                [registro.tipo]: registro.data_hora,
+              },
+            };
+          },
+          {} as Record<string, any>,
+        );
+        console.log(registrosTable);
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
     }
   };
 
@@ -84,8 +146,11 @@ export default function Home() {
             </PopoverContent>
           </Popover>
         </div>
-        <button className="rounded bg-slate-500/40 bg-gradient-to-r px-4 py-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white">
-          Enviar
+        <button
+          disabled={loading}
+          className="rounded bg-slate-500/40 bg-gradient-to-r px-4 py-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white disabled:bg-slate-500/10"
+        >
+          {loading ? "Enviando..." : "Enviar"}
         </button>
       </form>
     </div>
