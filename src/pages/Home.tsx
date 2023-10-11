@@ -4,6 +4,7 @@ import { CalendarIcon } from "@radix-ui/react-icons";
 import { /* addDays, */ format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { ptBR } from "date-fns/locale";
+import { addHours } from "date-fns";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
 type Registro = {
   id: number;
   cpf: string;
@@ -22,12 +32,24 @@ type Registro = {
     | "inicio-intervalo"
     | "fim-intervalo"
     | "saida"
-    | "falta"
-    | "atestado"
     | "ferias"
     | "feriado"
-    | "facultativo";
+    | "facultativo"
+    | "atestado"
+    | "falta";
   data_hora: string;
+};
+
+type FilteredRegistro = {
+  entrada?: string;
+  "fim-intervalo"?: string;
+  "inicio-intervalo"?: string;
+  saida?: string;
+  falta?: string;
+  atestado?: string;
+  ferias?: string;
+  feriado?: string;
+  facultativo?: string;
 };
 
 type RegistroAPIResponse = {
@@ -46,6 +68,10 @@ export default function Home() {
   });
 
   const [loading, setLoading] = React.useState<boolean>(false);
+
+  const [registros, setRegistros] = React.useState<
+    Record<string, FilteredRegistro> | undefined
+  >(undefined);
 
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
@@ -67,7 +93,6 @@ export default function Home() {
         }
 
         const data: RegistroAPIResponse = await res.json();
-        console.log(data);
         setLoading(false);
 
         const registros = data.registros;
@@ -86,7 +111,7 @@ export default function Home() {
           },
           {} as Record<string, any>,
         );
-        console.log(registrosTable);
+        setRegistros(registrosTable);
       } catch (error) {
         console.log(error);
         setLoading(false);
@@ -153,6 +178,132 @@ export default function Home() {
           {loading ? "Enviando..." : "Enviar"}
         </button>
       </form>
+      <div className="mx-4 flex-1 rounded border border-white/20 bg-slate-800 bg-gradient-to-br from-indigo-700/20 to-rose-500/20">
+        <Table className="flex-1 shadow shadow-black/20">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-center text-white">Data</TableHead>
+              <TableHead className="text-center text-white">Entrada</TableHead>
+              <TableHead className="text-center text-white">
+                Ini. Interv.
+              </TableHead>
+              <TableHead className="text-center text-white">
+                Fim Interv.
+              </TableHead>
+              <TableHead className="text-center text-white">Saída</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody className="text-slate-200/80">
+            {registros &&
+              Object.keys(registros).map((dateKey) => (
+                <TableRow className="text-center" key={crypto.randomUUID()}>
+                  <TableCell>
+                    {format(new Date(`${dateKey} 12:00:00`), "dd/MM - EEEEEE", {
+                      locale: ptBR,
+                    })}
+                  </TableCell>
+                  {registros[dateKey]?.ferias ? (
+                    <>
+                      <TableCell>FÉRIAS</TableCell>
+                      <TableCell>FÉRIAS</TableCell>
+                      <TableCell>FÉRIAS</TableCell>
+                      <TableCell>FÉRIAS</TableCell>
+                    </>
+                  ) : (
+                    <>
+                      {registros[dateKey]?.feriado ? (
+                        <>
+                          <TableCell>FERIADO</TableCell>
+                          <TableCell>FERIADO</TableCell>
+                          <TableCell>FERIADO</TableCell>
+                          <TableCell>FERIADO</TableCell>
+                        </>
+                      ) : (
+                        <>
+                          {registros[dateKey]?.facultativo ? (
+                            <>
+                              <TableCell>FACULTATIVO</TableCell>
+                              <TableCell>FACULTATIVO</TableCell>
+                              <TableCell>FACULTATIVO</TableCell>
+                              <TableCell>FACULTATIVO</TableCell>
+                            </>
+                          ) : (
+                            <>
+                              {registros[dateKey]?.atestado ? (
+                                <>
+                                  <TableCell>ATESTADO</TableCell>
+                                  <TableCell>ATESTADO</TableCell>
+                                  <TableCell>ATESTADO</TableCell>
+                                  <TableCell>ATESTADO</TableCell>
+                                </>
+                              ) : (
+                                <>
+                                  {registros[dateKey]?.falta ? (
+                                    <>
+                                      <TableCell>FALTA</TableCell>
+                                      <TableCell>FALTA</TableCell>
+                                      <TableCell>FALTA</TableCell>
+                                      <TableCell>FALTA</TableCell>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <TableCell>
+                                        {addHours(
+                                          new Date(
+                                            registros[dateKey]?.entrada || "",
+                                          ),
+                                          auth()?.user.setor.soma_entrada || 0,
+                                        ).toLocaleTimeString("pt-BR", {
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                        })}
+                                      </TableCell>
+                                      <TableCell>
+                                        {new Date(
+                                          registros[dateKey]?.[
+                                            "inicio-intervalo"
+                                          ] || "",
+                                        ).toLocaleTimeString("pt-BR", {
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                        })}
+                                      </TableCell>
+                                      <TableCell>
+                                        {new Date(
+                                          registros[dateKey]?.[
+                                            "fim-intervalo"
+                                          ] || "",
+                                        ).toLocaleTimeString("pt-BR", {
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                        })}
+                                      </TableCell>
+                                      <TableCell>
+                                        {addHours(
+                                          new Date(
+                                            registros[dateKey]?.saida || "",
+                                          ),
+                                          auth()?.user.setor.soma_saida || 0,
+                                        ).toLocaleTimeString("pt-BR", {
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                        })}
+                                      </TableCell>
+                                    </>
+                                  )}
+                                </>
+                              )}
+                            </>
+                          )}
+                        </>
+                      )}
+                    </>
+                  )}
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
