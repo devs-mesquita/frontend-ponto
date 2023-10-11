@@ -175,7 +175,7 @@ export default function Home() {
           disabled={loading}
           className="rounded bg-slate-500/40 bg-gradient-to-r px-4 py-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white disabled:bg-slate-500/10"
         >
-          {loading ? "Enviando..." : "Enviar"}
+          {loading ? "Carregando..." : "Consultar"}
         </button>
       </form>
       <div className="mx-4 flex-1 rounded border border-white/20 bg-slate-800 bg-gradient-to-br from-indigo-700/20 to-rose-500/20">
