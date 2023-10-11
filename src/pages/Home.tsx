@@ -22,50 +22,72 @@ export default function Home() {
     from: undefined, //new Date(),
     to: undefined, //addDays(new Date(), 30),
   });
+
+  const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+
+    if (date?.from && date.to && auth()?.user.cpf) {
+      console.log("Sent !");
+      console.log(date, auth()?.user.cpf);
+    }
+  };
+
   return (
-    <div className="my-4 flex flex-1 flex-col p-4 font-mono ">
-      <h1 className="pb-4 text-center tracking-widest text-slate-100/80">
-        Olá, {auth()?.user.name.split(" ")[0]}.
-      </h1>
-      <div className={cn("dark grid gap-2")}>
-        <Popover>
-          <PopoverTrigger asChild className="dark">
-            <Button
-              id="date"
-              variant={"outline"}
-              className={cn(
-                "dark w-[300px] justify-start text-left font-normal text-slate-100",
-                !date && "text-muted-foreground",
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {date?.from ? (
-                date.to ? (
-                  <>
-                    {format(date.from, "dd/MM/yy", { locale: ptBR })} ~{" "}
-                    {format(date.to, "dd/MM/yy", { locale: ptBR })}
-                  </>
+    <div className="my-4 flex flex-1 flex-col gap-4 font-mono ">
+      <h1 className="text-center text-slate-200/90">Consultar Pontos</h1>
+      <form
+        className="flex items-center justify-center gap-4"
+        onSubmit={handleSubmit}
+      >
+        <div className={cn("dark grid gap-2")}>
+          <Popover>
+            <PopoverTrigger asChild className="dark">
+              <Button
+                id="date"
+                variant={"outline"}
+                className={cn(
+                  "dark w-[280px] justify-start text-left font-normal text-slate-100",
+                  !date && "text-muted-foreground",
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date?.from ? (
+                  date.to ? (
+                    <>
+                      {format(date.from, "dd/MM/yy", { locale: ptBR })} ~{" "}
+                      {format(date.to, "dd/MM/yy", { locale: ptBR })}
+                    </>
+                  ) : (
+                    format(date.from, "dd/MM/yy", { locale: ptBR })
+                  )
                 ) : (
-                  format(date.from, "dd/MM/yy", { locale: ptBR })
-                )
-              ) : (
-                <span>Selecione uma data</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="dark w-auto p-0" align="start">
-            <Calendar
-              className="dark"
-              initialFocus
-              mode="range"
-              defaultMonth={date?.from}
-              selected={date}
-              onSelect={setDate}
-              numberOfMonths={1}
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
+                  <span>Selecione o período</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="dark w-auto bg-slate-800 bg-gradient-to-br from-indigo-700/30 to-rose-500/30 p-0 shadow shadow-black/30"
+              align="start"
+            >
+              <Calendar
+                className="dark"
+                initialFocus
+                mode="range"
+                defaultMonth={date?.from}
+                selected={date}
+                onSelect={setDate}
+                numberOfMonths={1}
+                max={31}
+                locale={ptBR}
+                disabled={{ after: new Date() }}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+        <button className="rounded bg-slate-500/40 bg-gradient-to-r px-4 py-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white">
+          Enviar
+        </button>
+      </form>
     </div>
   );
 }
