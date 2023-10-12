@@ -283,7 +283,12 @@ export default function Home() {
                                           new Date(
                                             registros[dateKey]?.saida || "",
                                           ),
-                                          auth()?.user.setor.soma_saida || 0,
+                                          new Date(
+                                            registros[dateKey]?.saida || "",
+                                          ).getDay() === 5
+                                            ? 0
+                                            : auth()?.user.setor.soma_saida ||
+                                                0,
                                         ).toLocaleTimeString("pt-BR", {
                                           hour: "2-digit",
                                           minute: "2-digit",
