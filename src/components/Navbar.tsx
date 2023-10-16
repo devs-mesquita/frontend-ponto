@@ -56,7 +56,7 @@ export default function Navbar() {
             {auth()?.user.nivel === "Super-Admin" && (
               <>
                 <NavLink
-                  to="/config"
+                  to="/configs"
                   className={({ isActive }) =>
                     `${
                       isActive
