@@ -5,6 +5,7 @@ import { /* addDays, */ format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { ptBR } from "date-fns/locale";
 import { addHours } from "date-fns";
+import InputMask from "react-input-mask";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -66,6 +67,12 @@ export default function Home() {
     from: undefined, //new Date(),
     to: undefined, //addDays(new Date(), 30),
   });
+  const [cpf, setCPF] = React.useState<string>("");
+
+  const handleChangeCPF = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    evt.preventDefault();
+    setCPF(evt.target.value);
+  };
 
   const [loading, setLoading] = React.useState<boolean>(false);
 
@@ -75,7 +82,14 @@ export default function Home() {
 
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
-    if (date?.from && date.to && auth()?.user.cpf) {
+    if (
+      date?.from &&
+      date.to &&
+      ((["Super-Admin"].includes(auth()?.user.nivel || "") &&
+        cpf.length === 14) ||
+        (!["Super-Admin"].includes(auth()?.user.nivel || "") &&
+          auth()?.user.cpf))
+    ) {
       setLoading(true);
       try {
         const res = await fetch(
@@ -83,7 +97,10 @@ export default function Home() {
             new URLSearchParams({
               from: date.from.toDateString(),
               to: date.to.toDateString(),
-              cpf: auth()?.user.cpf || "",
+              cpf:
+                auth()?.user.nivel === "Super-Admin"
+                  ? cpf.replace("-", "").replace(".", "").replace(".", "")
+                  : auth()?.user.cpf || "",
             }),
         );
 
@@ -123,9 +140,25 @@ export default function Home() {
     <div className="my-4 flex flex-1 flex-col gap-4 font-mono ">
       <h1 className="text-center text-slate-200/90">Consultar Pontos</h1>
       <form
-        className="flex items-center justify-center gap-4"
+        className="flex flex-col items-center justify-center gap-4 md:flex-row"
         onSubmit={handleSubmit}
       >
+        {["Super-Admin"].includes(auth()?.user.nivel || "") && (
+          <InputMask
+            autoComplete="off"
+            name="cpf"
+            type="text"
+            value={cpf}
+            onChange={handleChangeCPF}
+            mask="999.999.999-99"
+            maskChar={null}
+            alwaysShowMask={false}
+            className="rounded border-2 bg-slate-200 p-1 text-center text-lg text-slate-800 shadow shadow-black/20 outline-0 focus:border-indigo-600/70 disabled:bg-slate-200/40"
+            disabled={loading}
+            placeholder="000.000.000-00"
+            required
+          />
+        )}
         <div className={cn("dark grid gap-2")}>
           <Popover>
             <PopoverTrigger asChild className="dark">
@@ -248,51 +281,63 @@ export default function Home() {
                                   ) : (
                                     <>
                                       <TableCell>
-                                        {addHours(
-                                          new Date(
-                                            registros[dateKey]?.entrada || "",
-                                          ),
-                                          auth()?.user.setor.soma_entrada || 0,
-                                        ).toLocaleTimeString("pt-BR", {
-                                          hour: "2-digit",
-                                          minute: "2-digit",
-                                        })}
-                                      </TableCell>
-                                      <TableCell>
-                                        {new Date(
-                                          registros[dateKey]?.[
-                                            "inicio-intervalo"
-                                          ] || "",
-                                        ).toLocaleTimeString("pt-BR", {
-                                          hour: "2-digit",
-                                          minute: "2-digit",
-                                        })}
-                                      </TableCell>
-                                      <TableCell>
-                                        {new Date(
-                                          registros[dateKey]?.[
-                                            "fim-intervalo"
-                                          ] || "",
-                                        ).toLocaleTimeString("pt-BR", {
-                                          hour: "2-digit",
-                                          minute: "2-digit",
-                                        })}
-                                      </TableCell>
-                                      <TableCell>
-                                        {addHours(
-                                          new Date(
-                                            registros[dateKey]?.saida || "",
-                                          ),
-                                          new Date(
-                                            registros[dateKey]?.saida || "",
-                                          ).getDay() === 5
-                                            ? 0
-                                            : auth()?.user.setor.soma_saida ||
+                                        {registros[dateKey]?.entrada
+                                          ? addHours(
+                                              new Date(
+                                                registros[dateKey]?.entrada ||
+                                                  "",
+                                              ),
+                                              auth()?.user.setor.soma_entrada ||
                                                 0,
-                                        ).toLocaleTimeString("pt-BR", {
-                                          hour: "2-digit",
-                                          minute: "2-digit",
-                                        })}
+                                            ).toLocaleTimeString("pt-BR", {
+                                              hour: "2-digit",
+                                              minute: "2-digit",
+                                            })
+                                          : "---"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {registros[dateKey]?.[
+                                          "inicio-intervalo"
+                                        ]
+                                          ? new Date(
+                                              registros[dateKey]?.[
+                                                "inicio-intervalo"
+                                              ] || "",
+                                            ).toLocaleTimeString("pt-BR", {
+                                              hour: "2-digit",
+                                              minute: "2-digit",
+                                            })
+                                          : "---"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {registros[dateKey]?.["fim-intervalo"]
+                                          ? new Date(
+                                              registros[dateKey]?.[
+                                                "fim-intervalo"
+                                              ] || "",
+                                            ).toLocaleTimeString("pt-BR", {
+                                              hour: "2-digit",
+                                              minute: "2-digit",
+                                            })
+                                          : "---"}
+                                      </TableCell>
+                                      <TableCell>
+                                        {registros[dateKey]?.saida
+                                          ? addHours(
+                                              new Date(
+                                                registros[dateKey]?.saida || "",
+                                              ),
+                                              new Date(
+                                                registros[dateKey]?.saida || "",
+                                              ).getDay() === 5
+                                                ? 0
+                                                : auth()?.user.setor
+                                                    .soma_saida || 0,
+                                            ).toLocaleTimeString("pt-BR", {
+                                              hour: "2-digit",
+                                              minute: "2-digit",
+                                            })
+                                          : "---"}
                                       </TableCell>
                                     </>
                                   )}
