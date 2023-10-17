@@ -4,7 +4,8 @@ import { Outlet } from "react-router-dom";
 export default function Layout() {
   return (
     <>
-      <div id="modal"></div>
+      <div id="notifications" />
+      <div id="modal" />
       <Navbar />
       <Outlet />
     </>

@@ -4,10 +4,21 @@
 
 //import { useAuthUser } from "react-auth-kit";
 import * as React from "react";
-import { CalendarIcon, TrashIcon } from "@radix-ui/react-icons";
+import {
+  CalendarIcon,
+  TrashIcon,
+  PlusCircledIcon,
+  MagnifyingGlassIcon,
+  TimerIcon,
+} from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { ptBR } from "date-fns/locale";
+
+import { useAtom } from "jotai";
+import { notificationAtom, notificationInitialState } from "@/store";
+
+import errorFromApi from "@/utils/errorFromAPI";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -29,6 +40,7 @@ import {
 
 import type { AppDialog } from "@/types/interfaces";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
+import TopNotification from "@/components/TopNotification";
 
 type Registro = {
   id: number;
@@ -61,12 +73,15 @@ type FilteredRegistro = {
 type RegistroAPIResponse = {
   registros: Registro[];
 };
+type Resultado = "existente";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Configs() {
   document.title = "Configurações";
   //const auth = useAuthUser();
+
+  const [notification, setNotification] = useAtom(notificationAtom);
 
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: undefined, //new Date(),
@@ -79,16 +94,20 @@ export default function Configs() {
     Record<string, FilteredRegistro> | undefined
   >(undefined);
 
-  const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmitConsulta = async (
+    evt: React.FormEvent<HTMLFormElement>,
+  ) => {
     evt.preventDefault();
     if (date?.from && date.to) {
       setLoading(true);
+      setNotification(notificationInitialState);
       try {
         const res = await fetch(
-          `${API_URL}/api/configs?` +
+          `${API_URL}/api/registro?` +
             new URLSearchParams({
               from: date.from.toDateString(),
               to: date.to.toDateString(),
+              cpf: "sistema",
             }),
         );
 
@@ -119,6 +138,70 @@ export default function Configs() {
         setRegistros(registrosTable);
       } catch (error) {
         console.log(error);
+        setNotification({
+          message: "Ocorreu um erro.",
+          type: "error",
+        });
+        setLoading(false);
+      }
+    }
+  };
+
+  const [dateNew, setDateNew] = React.useState<Date>();
+  const [tipoNew, setTipoNew] = React.useState<string>("");
+
+  const handleSubmitNovo = async (evt: React.FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+    if (dateNew && tipoNew) {
+      setLoading(true);
+      setNotification(notificationInitialState);
+
+      try {
+        const res = await fetch(`${API_URL}/api/registro`, {
+          method: "POST",
+          body: JSON.stringify({
+            date: dateNew.toDateString(),
+            tipo: tipoNew,
+            cpf: "sistema",
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw err;
+        }
+
+        const data: RegistroAPIResponse = await res.json();
+        console.log(data);
+
+        setLoading(false);
+        setNotification({
+          message: "Registro criado com sucesso.",
+          type: "success",
+        });
+        setDateNew(undefined);
+        setTipoNew("");
+      } catch (error) {
+        console.log(error);
+
+        if (error instanceof Error) {
+          setNotification({
+            message: "Ocorreu um erro.",
+            type: "error",
+          });
+        } else if (errorFromApi<{ resultado: Resultado }>(error, "resultado")) {
+          const resultado = error.resultado as Resultado;
+          if (resultado === "existente") {
+            setNotification({
+              message: "Um registro já existe na data selecionada.",
+              type: "error",
+            });
+          }
+        }
+
         setLoading(false);
       }
     }
@@ -151,11 +234,15 @@ export default function Configs() {
   const handleDelete = async (dateKey: string) => {
     try {
       setLoading(true);
+      setNotification(notificationInitialState);
       console.log(dateKey);
 
-      /* const res = await fetch(`${API_URL}/api/configs/delete`, {
+      const res = await fetch(`${API_URL}/api/registro/delete`, {
         method: "POST",
-        body: JSON.stringify({ date: dateKey }),
+        body: JSON.stringify({
+          date: dateKey,
+          cpf: "sistema",
+        }),
         headers: {
           "Content-Type": "application/json",
         },
@@ -167,13 +254,20 @@ export default function Configs() {
       }
 
       const data = await res.json();
-      console.log(data); */
+      console.log(data);
 
       setLoading(false);
       setDialog(dialogInitialState);
-      
+      setNotification({
+        message: "Operação efetuada com sucesso.",
+        type: "success",
+      });
     } catch (error) {
       setLoading(false);
+      setNotification({
+        message: "Ocorreu um erro.",
+        type: "error",
+      });
       console.log(error);
     }
   };
@@ -184,62 +278,127 @@ export default function Configs() {
         <h1 className="text-center text-slate-200/90">
           Feriados e Pontos Facultativos
         </h1>
-        <form
-          className="flex flex-col items-center justify-center gap-4 md:flex-row"
-          onSubmit={handleSubmit}
-        >
-          <div className={cn("dark grid gap-2")}>
+        <div className="flex flex-col items-center justify-around gap-8 md:flex-row md:gap-4">
+          <form
+            className="flex-2 flex flex-col items-center justify-center gap-2"
+            onSubmit={handleSubmitConsulta}
+          >
+            <h2 className="text-center text-slate-200/90">Consultar</h2>
+            <div className="flex flex-col items-center gap-2 md:flex-row">
+              <div className={cn("dark grid gap-2")}>
+                <Popover>
+                  <PopoverTrigger asChild className="dark">
+                    <Button
+                      id="date"
+                      variant={"outline"}
+                      className={cn(
+                        "dark w-[250px] justify-start text-left font-normal text-slate-100",
+                        !date && "text-muted-foreground",
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {date?.from ? (
+                        date.to ? (
+                          <>
+                            {format(date.from, "dd/MM/yy", { locale: ptBR })} ~{" "}
+                            {format(date.to, "dd/MM/yy", { locale: ptBR })}
+                          </>
+                        ) : (
+                          format(date.from, "dd/MM/yy", { locale: ptBR })
+                        )
+                      ) : (
+                        <span>Selecione o período</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="dark w-auto bg-slate-800 bg-gradient-to-br from-indigo-700/30 to-rose-500/30 p-0 shadow shadow-black/30"
+                    align="start"
+                  >
+                    <Calendar
+                      className="dark"
+                      initialFocus
+                      mode="range"
+                      defaultMonth={date?.from}
+                      selected={date}
+                      onSelect={setDate}
+                      numberOfMonths={2}
+                      max={62}
+                      locale={ptBR}
+                      // disabled={{ after: new Date() }}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <button
+                disabled={loading}
+                className="rounded bg-slate-500/40 bg-gradient-to-r p-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white disabled:bg-slate-500/10"
+              >
+                {loading ? (
+                  <TimerIcon className="h-5 w-5 text-white/50" />
+                ) : (
+                  <MagnifyingGlassIcon className="h-5 w-5" />
+                )}
+              </button>
+            </div>
+          </form>
+          <form
+            className="flex-2 flex flex-col items-center justify-center gap-2"
+            onSubmit={handleSubmitNovo}
+          >
+            <h2 className="text-center text-slate-200/90">Novo</h2>
             <Popover>
-              <PopoverTrigger asChild className="dark">
+              <PopoverTrigger asChild>
                 <Button
-                  id="date"
                   variant={"outline"}
                   className={cn(
-                    "dark w-[280px] justify-start text-left font-normal text-slate-100",
-                    !date && "text-muted-foreground",
+                    "w-[250px] justify-start text-left font-normal",
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date?.from ? (
-                    date.to ? (
-                      <>
-                        {format(date.from, "dd/MM/yy", { locale: ptBR })} ~{" "}
-                        {format(date.to, "dd/MM/yy", { locale: ptBR })}
-                      </>
-                    ) : (
-                      format(date.from, "dd/MM/yy", { locale: ptBR })
-                    )
+                  {dateNew ? (
+                    format(dateNew, "PPP", { locale: ptBR })
                   ) : (
-                    <span>Selecione o período</span>
+                    <span>Selecione a data</span>
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent
-                className="dark w-auto bg-slate-800 bg-gradient-to-br from-indigo-700/30 to-rose-500/30 p-0 shadow shadow-black/30"
-                align="start"
-              >
+              <PopoverContent className="dark w-auto bg-slate-800 bg-gradient-to-br from-indigo-700/30 to-rose-500/30 p-0 shadow shadow-black/30">
                 <Calendar
                   className="dark"
-                  initialFocus
-                  mode="range"
-                  defaultMonth={date?.from}
-                  selected={date}
-                  onSelect={setDate}
-                  numberOfMonths={2}
-                  max={62}
+                  mode="single"
+                  selected={dateNew}
+                  onSelect={setDateNew}
                   locale={ptBR}
-                  // disabled={{ after: new Date() }}
+                  initialFocus
                 />
               </PopoverContent>
             </Popover>
-          </div>
-          <button
-            disabled={loading}
-            className="rounded bg-slate-500/40 bg-gradient-to-r px-4 py-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white disabled:bg-slate-500/10"
-          >
-            {loading ? "Carregando..." : "Consultar"}
-          </button>
-        </form>
+            <div className="flex items-center gap-4">
+              <select
+                className="rounded border-2 bg-slate-200 px-2 py-1 text-slate-800 shadow shadow-black/20 outline-0 focus:border-indigo-600/70 disabled:bg-slate-200/40"
+                disabled={loading}
+                required
+                value={tipoNew}
+                onChange={(evt) => setTipoNew(evt.target.value)}
+              >
+                <option value="">Selecione o tipo</option>
+                <option value="feriado">Feriado</option>
+                <option value="facultativo">Ponto Facultativo</option>
+              </select>
+              <button
+                title="Criar novo feriado/ponto facultativo."
+                className="rounded bg-green-600 p-1 text-green-200 shadow shadow-black/20 hover:bg-green-500"
+              >
+                {loading ? (
+                  <TimerIcon className="h-5 w-5 text-white/50" />
+                ) : (
+                  <PlusCircledIcon className="h-5 w-5" />
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
         <div className="mx-4 flex-1 rounded border border-white/20 bg-slate-800 bg-gradient-to-br from-indigo-700/20 to-rose-500/20">
           <Table className="flex-1 shadow shadow-black/20">
             <TableHeader>
@@ -268,14 +427,18 @@ export default function Configs() {
                           <TableCell>FERIADO</TableCell>
                           <TableCell>
                             <form
-                              onSubmit={() =>
+                              onSubmit={(evt) => {
+                                evt.preventDefault();
                                 handleConfirmation(
                                   () => handleDelete(dateKey),
                                   "Deseja confirmar a remoção do feriado?",
-                                )
-                              }
+                                );
+                              }}
                             >
-                              <button>
+                              <button
+                                title="Remover feriado."
+                                className="rounded bg-red-500/80 p-2 shadow shadow-black/20 hover:bg-red-600/80"
+                              >
                                 <TrashIcon className="h-4 w-4" />
                               </button>
                             </form>
@@ -288,14 +451,18 @@ export default function Configs() {
                               <TableCell>FACULTATIVO</TableCell>
                               <TableCell>
                                 <form
-                                  onSubmit={() =>
+                                  onSubmit={(evt) => {
+                                    evt.preventDefault();
                                     handleConfirmation(
                                       () => handleDelete(dateKey),
                                       "Deseja confirmar a remoção do ponto facultativo?",
-                                    )
-                                  }
+                                    );
+                                  }}
                                 >
-                                  <button>
+                                  <button
+                                    title="Remover ponto facultativo."
+                                    className="rounded bg-red-500/80 p-2 shadow shadow-black/20 hover:bg-red-600/80"
+                                  >
                                     <TrashIcon className="h-4 w-4" />
                                   </button>
                                 </form>
@@ -320,6 +487,7 @@ export default function Configs() {
           message={dialog.message}
         />
       )}
+      {notification.message && <TopNotification />}
     </>
   );
 }

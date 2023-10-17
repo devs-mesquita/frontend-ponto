@@ -4,3 +4,8 @@ export interface AppDialog {
   accept: () => void;
   reject: () => void;
 }
+
+export type AppNotification = {
+  message: string;
+  type: "error" | "success" | "";
+};
