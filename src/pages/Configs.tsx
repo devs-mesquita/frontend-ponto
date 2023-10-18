@@ -94,13 +94,9 @@ export default function Configs() {
     Record<string, FilteredRegistro> | undefined
   >(undefined);
 
-  const handleSubmitConsulta = async (
-    evt: React.FormEvent<HTMLFormElement>,
-  ) => {
-    evt.preventDefault();
+  const fetchConsulta = async () => {
     if (date?.from && date.to) {
       setLoading(true);
-      setNotification(notificationInitialState);
       try {
         const res = await fetch(
           `${API_URL}/api/registro?` +
@@ -147,6 +143,14 @@ export default function Configs() {
     }
   };
 
+  const handleSubmitConsulta = async (
+    evt: React.FormEvent<HTMLFormElement>,
+  ) => {
+    evt.preventDefault();
+    setNotification(notificationInitialState);
+    await fetchConsulta();
+  };
+
   const [dateNew, setDateNew] = React.useState<Date>();
   const [tipoNew, setTipoNew] = React.useState<string>("");
 
@@ -184,6 +188,7 @@ export default function Configs() {
         });
         setDateNew(undefined);
         setTipoNew("");
+        await fetchConsulta();
       } catch (error) {
         console.log(error);
 
@@ -259,9 +264,10 @@ export default function Configs() {
       setLoading(false);
       setDialog(dialogInitialState);
       setNotification({
-        message: "Operação efetuada com sucesso.",
+        message: "Registro removido com sucesso.",
         type: "success",
       });
+      await fetchConsulta();
     } catch (error) {
       setLoading(false);
       setNotification({
