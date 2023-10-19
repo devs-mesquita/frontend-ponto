@@ -63,7 +63,7 @@ export default function Configs() {
   const [notification, setNotification] = useAtom(notificationAtom);
   const [loading, setLoading] = React.useState<boolean>(false);
 
-  const [setorOptions, setSetorOptions] = React.useState<Setor[]>([]);
+  const [setores, setSetores] = React.useState<Setor[]>([]);
   const [setorID, setSetorID] = React.useState<string>("");
   const [users, setUsers] = React.useState<UserWithSetor[]>([]);
 
@@ -75,6 +75,7 @@ export default function Configs() {
 
         if (!res.ok) {
           const err = await res.json();
+          console.log(err);
           throw err;
         }
 
@@ -102,6 +103,30 @@ export default function Configs() {
     }
   };
 
+  React.useEffect(() => {
+    const getSetores = async () => {
+      if (auth()?.user.nivel === "Super-Admin") {
+        try {
+          const res = await fetch(`${API_URL}/api/setores`);
+
+          if (!res.ok) {
+            const err = await res.json();
+            throw err;
+          }
+
+          const data: { setores: Setor[] } = await res.json();
+          setSetores(data.setores);
+        } catch (error) {
+          console.error(error);
+        }
+      } else {
+        setSetores([auth()?.user.setor as Setor]);
+      }
+    };
+
+    getSetores();
+  }, []);
+
   return (
     <>
       <div className="my-4 flex flex-1 flex-col gap-4 font-mono ">
@@ -121,7 +146,7 @@ export default function Configs() {
                 onChange={(evt) => setSetorID(evt.target.value)}
               >
                 <option value="">Selecione o setor</option>
-                {setorOptions.map((setor) => (
+                {setores.map((setor) => (
                   <option value={setor.id} key={crypto.randomUUID()}>
                     {setor.nome}
                   </option>
