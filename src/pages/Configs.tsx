@@ -1,7 +1,3 @@
-// Configurações/Administração:
-// - Criação de feriado/ponto facultativo (cpf = "sistema");
-// - Lista de Feriados/Pontos Facultativos criados.
-
 import { useAuthUser } from "react-auth-kit";
 import * as React from "react";
 import {
@@ -85,8 +81,8 @@ export default function Configs() {
   const [notification, setNotification] = useAtom(notificationAtom);
 
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: undefined, //new Date(),
-    to: undefined, //addDays(new Date(), 30),
+    from: undefined,
+    to: undefined,
   });
 
   const [loading, setLoading] = React.useState<boolean>(false);

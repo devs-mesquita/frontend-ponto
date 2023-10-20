@@ -1,30 +1,11 @@
 /*
 Tabela de Usuários:
-  — Features:
-    - Paginação;
-    - Filtros;
-    - Ordenação;
-
-    DONE - Consulta da tabela por Setor;
-      - Super: Qualquer setor;
-      - Admin: Próprio setor.
-
-  — Ações:
-    > Admin:
-      > Popups:
-        - onClick Action > Set the popup.isOpen to true, Set the user to the corresponding user.
-        - Atribuição de falta (popup, single date);
-        - Atribuição de férias (popup, date range).
-        - Consultar Pontos (popup, date range);
-        TBD - Atribuição de atestado (popup date range, comprovante atestado?);
-
-        - Resetar Senha (confirmDialog).
+  - Paginação;
+  - Filtros;
+  - Ordenação;
+Ações:
+  - Resetar Senha (confirmDialog).
 */
-
-// Configurações/Administração:
-// - Criação de feriado/ponto facultativo (cpf = "sistema");
-// - Lista de Feriados/Pontos Facultativos criados.
-
 import { useAuthUser } from "react-auth-kit";
 import * as React from "react";
 import { useAtom } from "jotai";

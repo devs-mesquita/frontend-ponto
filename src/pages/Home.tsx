@@ -1,7 +1,7 @@
 import { useAuthUser } from "react-auth-kit";
 import * as React from "react";
 import { CalendarIcon } from "@radix-ui/react-icons";
-import { /* addDays, */ format } from "date-fns";
+import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { ptBR } from "date-fns/locale";
 import { addHours } from "date-fns";
@@ -64,8 +64,8 @@ export default function Home() {
   const auth = useAuthUser();
 
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: undefined, //new Date(),
-    to: undefined, //addDays(new Date(), 30),
+    from: undefined,
+    to: undefined,
   });
   const [cpf, setCPF] = React.useState<string>("");
 
