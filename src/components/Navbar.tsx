@@ -13,7 +13,7 @@ export default function Navbar() {
   return (
     <header className="flex items-center gap-8 border-b border-white/20 px-4 shadow shadow-black/20 md:px-8 md:py-4">
       <NavLink
-        to="/"
+        to={auth()?.user.setor.nome === "PONTO" ? "/ponto" : "/"}
         className={({ isActive }) =>
           `${
             isActive ? "text-white" : "text-white/60 hover:text-white/80"
@@ -21,6 +21,16 @@ export default function Navbar() {
         }
       >
         Ponto Eletrônico
+      </NavLink>
+      <NavLink
+        to="/"
+        className={({ isActive }) =>
+          `${
+            isActive ? "text-white" : "text-white/60 hover:text-white/80"
+          } text-center`
+        }
+      >
+        Home
       </NavLink>
       {isAuthenticated() ? (
         <div className="ml-auto flex flex-col-reverse items-end gap-4 py-4 md:flex-row md:items-center md:gap-16 md:py-0">

@@ -2,7 +2,7 @@ import * as React from "react";
 import ReactDOM from "react-dom";
 import type { UserWithSetor } from "@/types/interfaces";
 
-import { CalendarIcon } from "@radix-ui/react-icons";
+import { CalendarIcon, TrashIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { ptBR } from "date-fns/locale";
@@ -16,6 +16,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+
+import { useAtom } from "jotai";
+import { notificationAtom, notificationInitialState } from "@/store";
+import { AppDialog } from "@/types/interfaces";
+import ConfirmationDialog from "../ConfirmationDialog";
 
 import {
   Table,
@@ -69,6 +74,8 @@ export default function ConsultarPontos({
   closePopup,
   user,
 }: ConsultarPontosProps) {
+  const setNotification = useAtom(notificationAtom)[1];
+
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: undefined, //new Date(),
     to: undefined, //addDays(new Date(), 30),
@@ -80,8 +87,7 @@ export default function ConsultarPontos({
     Record<string, FilteredRegistro> | undefined
   >(undefined);
 
-  const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
-    evt.preventDefault();
+  const fetchConsulta = async () => {
     if (date?.from && date.to) {
       setLoading(true);
       try {
@@ -118,28 +124,108 @@ export default function ConsultarPontos({
           },
           {} as Record<string, any>,
         );
-
         setRegistros(registrosTable);
       } catch (error) {
         console.log(error);
+        setNotification({
+          message: "Ocorreu um erro.",
+          type: "error",
+        });
         setLoading(false);
       }
     }
   };
 
+  const handleSubmitConsulta = async (
+    evt: React.FormEvent<HTMLFormElement>,
+  ) => {
+    evt.preventDefault();
+    setNotification(notificationInitialState);
+    await fetchConsulta();
+  };
+
+  const dialogInitialState: AppDialog = {
+    isOpen: false,
+    message: "",
+    accept: () => {},
+    reject: () => {},
+  };
+
+  const [dialog, setDialog] = React.useState<AppDialog>(dialogInitialState);
+
+  const handleConfirmation = (
+    accept: () => void,
+    message: string = "Deseja confimar a operação?",
+    reject = () => {
+      setDialog(() => dialogInitialState);
+    },
+  ) => {
+    setDialog({
+      isOpen: true,
+      accept,
+      reject,
+      message,
+    });
+  };
+
+  const handleDelete = async (dateKey: string, tipo: string) => {
+    try {
+      setLoading(true);
+      setNotification(notificationInitialState);
+      console.log(dateKey);
+
+      const res = await fetch(`${API_URL}/api/registro/delete`, {
+        method: "POST",
+        body: JSON.stringify({
+          date: dateKey,
+          tipo,
+          cpf: user.cpf,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw err;
+      }
+
+      const data = await res.json();
+      console.log(data);
+
+      setLoading(false);
+      setDialog(dialogInitialState);
+      setNotification({
+        message: "Registro removido com sucesso.",
+        type: "success",
+      });
+      await fetchConsulta();
+    } catch (error) {
+      setLoading(false);
+      setNotification({
+        message: "Ocorreu um erro.",
+        type: "error",
+      });
+      console.log(error);
+    }
+  };
+
+  const names = user.name.split(" ");
+  const briefUserName = `${names[0]} ${
+    names[1].length > 3 ? names[1] : `${names[1]} ${names[2]}`
+  }`;
+
   return ReactDOM.createPortal(
     <>
-      <div className="fixed left-1/2 top-1/2 z-40 flex w-[28rem] translate-x-[-50%] translate-y-[-50%] flex-col gap-3 rounded bg-slate-700 bg-gradient-to-br from-indigo-500/40 to-rose-500/40 p-4 md:w-[45rem] lg:w-[60rem]">
+      <div className="fixed left-1/2 top-1/2 z-30 flex w-[28rem] translate-x-[-50%] translate-y-[-50%] flex-col gap-3 rounded bg-slate-700 bg-gradient-to-br from-indigo-500/40 to-rose-500/40 p-4 md:w-[45rem] lg:w-[60rem]">
         <div className="my-4 flex h-full flex-1 flex-col gap-4 font-mono">
           <h2 className="text-center text-slate-200/90">
-            Consultar Pontos de{" "}
-            {`${user.name.split(" ")[0]} ${
-              user.name.split(" ").slice(-1) || ""
-            }`}
+            Consultar Pontos de {briefUserName}
           </h2>
           <form
             className="flex flex-col items-center justify-center gap-4 md:flex-row"
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmitConsulta}
           >
             <div className={cn("dark grid gap-2")}>
               <Popover>
@@ -210,6 +296,9 @@ export default function ConsultarPontos({
                   <TableHead className="text-center text-white">
                     Saída
                   </TableHead>
+                  <TableHead className="text-center text-white">
+                    Ações
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody className="text-slate-200/80">
@@ -231,6 +320,24 @@ export default function ConsultarPontos({
                           <TableCell>FÉRIAS</TableCell>
                           <TableCell>FÉRIAS</TableCell>
                           <TableCell>FÉRIAS</TableCell>
+                          <TableCell>
+                            <form
+                              onSubmit={(evt) => {
+                                evt.preventDefault();
+                                handleConfirmation(
+                                  () => handleDelete(dateKey, "ferias"),
+                                  "Deseja confirmar a remoção da féria?",
+                                );
+                              }}
+                            >
+                              <button
+                                title="Remover féria."
+                                className="rounded bg-red-500/80 p-2 shadow shadow-black/20 hover:bg-red-600/80"
+                              >
+                                <TrashIcon className="h-4 w-4" />
+                              </button>
+                            </form>
+                          </TableCell>
                         </>
                       ) : (
                         <>
@@ -240,6 +347,7 @@ export default function ConsultarPontos({
                               <TableCell>FERIADO</TableCell>
                               <TableCell>FERIADO</TableCell>
                               <TableCell>FERIADO</TableCell>
+                              <TableCell></TableCell>
                             </>
                           ) : (
                             <>
@@ -249,6 +357,7 @@ export default function ConsultarPontos({
                                   <TableCell>FACULTATIVO</TableCell>
                                   <TableCell>FACULTATIVO</TableCell>
                                   <TableCell>FACULTATIVO</TableCell>
+                                  <TableCell></TableCell>
                                 </>
                               ) : (
                                 <>
@@ -258,6 +367,28 @@ export default function ConsultarPontos({
                                       <TableCell>ATESTADO</TableCell>
                                       <TableCell>ATESTADO</TableCell>
                                       <TableCell>ATESTADO</TableCell>
+                                      <TableCell>
+                                        <form
+                                          onSubmit={(evt) => {
+                                            evt.preventDefault();
+                                            handleConfirmation(
+                                              () =>
+                                                handleDelete(
+                                                  dateKey,
+                                                  "atestado",
+                                                ),
+                                              "Deseja confirmar a remoção do atestado?",
+                                            );
+                                          }}
+                                        >
+                                          <button
+                                            title="Remover feriado."
+                                            className="rounded bg-red-500/80 p-2 shadow shadow-black/20 hover:bg-red-600/80"
+                                          >
+                                            <TrashIcon className="h-4 w-4" />
+                                          </button>
+                                        </form>
+                                      </TableCell>
                                     </>
                                   ) : (
                                     <>
@@ -267,6 +398,28 @@ export default function ConsultarPontos({
                                           <TableCell>FALTA</TableCell>
                                           <TableCell>FALTA</TableCell>
                                           <TableCell>FALTA</TableCell>
+                                          <TableCell>
+                                            <form
+                                              onSubmit={(evt) => {
+                                                evt.preventDefault();
+                                                handleConfirmation(
+                                                  () =>
+                                                    handleDelete(
+                                                      dateKey,
+                                                      "falta",
+                                                    ),
+                                                  "Deseja confirmar a remoção da falta?",
+                                                );
+                                              }}
+                                            >
+                                              <button
+                                                title="Remover feriado."
+                                                className="rounded bg-red-500/80 p-2 shadow shadow-black/20 hover:bg-red-600/80"
+                                              >
+                                                <TrashIcon className="h-4 w-4" />
+                                              </button>
+                                            </form>
+                                          </TableCell>
                                         </>
                                       ) : (
                                         <>
@@ -350,9 +503,16 @@ export default function ConsultarPontos({
         </div>
       </div>
       <div
-        className="fixed z-30 h-screen w-screen bg-black/30 backdrop-blur-sm"
+        className="fixed z-20 h-screen w-screen bg-black/30 backdrop-blur-sm"
         onClick={closePopup}
       />
+      {dialog.isOpen && (
+        <ConfirmationDialog
+          accept={dialog.accept}
+          reject={dialog.reject}
+          message={dialog.message}
+        />
+      )}
     </>,
     document.querySelector<HTMLDivElement>("#modal")!,
   );

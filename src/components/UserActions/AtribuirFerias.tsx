@@ -69,7 +69,6 @@ export default function AtribuirFerias({
           type: "success",
         });
         closePopup();
-
       } catch (error) {
         console.log(error);
 
@@ -93,15 +92,17 @@ export default function AtribuirFerias({
     }
   };
 
+  const names = user.name.split(" ");
+  const briefUserName = `${names[0]} ${
+    names[1].length > 3 ? names[1] : `${names[1]} ${names[2]}`
+  }`;
+
   return ReactDOM.createPortal(
     <>
-      <div className="fixed left-1/2 top-1/2 z-40 flex w-[28rem] translate-x-[-50%] translate-y-[-50%] flex-col gap-3 rounded bg-slate-700 bg-gradient-to-br from-indigo-500/40 to-rose-500/40 p-4 md:w-[40rem] lg:w-[40rem]">
+      <div className="fixed left-1/2 top-1/2 z-30 flex w-[28rem] translate-x-[-50%] translate-y-[-50%] flex-col gap-3 rounded bg-slate-700 bg-gradient-to-br from-indigo-500/40 to-rose-500/40 p-4 md:w-[40rem] lg:w-[40rem]">
         <div className="my-4 flex h-full flex-1 flex-col gap-4 font-mono">
           <h2 className="text-center text-slate-200/90">
-            Atribuir férias para{" "}
-            {`${user.name.split(" ")[0]} ${
-              user.name.split(" ").slice(-1) || ""
-            }`}
+            Atribuir férias para {briefUserName}
           </h2>
           <form
             className="flex flex-col items-center justify-center gap-4"
@@ -113,7 +114,7 @@ export default function AtribuirFerias({
               )}
             >
               <Calendar
-                className="dark rounded shadow shadow-black/30"
+                className="dark rounded text-white shadow shadow-black/30"
                 initialFocus
                 mode="range"
                 defaultMonth={date?.from}
@@ -137,7 +138,7 @@ export default function AtribuirFerias({
         </div>
       </div>
       <div
-        className="fixed z-30 h-screen w-screen bg-black/30 backdrop-blur-sm"
+        className="fixed z-20 h-screen w-screen bg-black/30 backdrop-blur-sm"
         onClick={closePopup}
       />
     </>,
