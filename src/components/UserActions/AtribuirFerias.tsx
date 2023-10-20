@@ -11,6 +11,7 @@ import { useAtom } from "jotai";
 
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
+import { differenceInDays, addDays } from "date-fns";
 
 type AtribuirFeriasProps = {
   user: UserWithSetor;
@@ -37,12 +38,19 @@ export default function AtribuirFerias({
     if (date?.from && date.to) {
       setLoading(true);
       setNotification(notificationInitialState);
+
+      const startDate = date.from;
+      const endDate = date.to;
+      const daysQuantity = differenceInDays(endDate, startDate) + 1;
+      const dates = Array.from({ length: daysQuantity }, (_value, index) => {
+        return addDays(startDate, index).toDateString();
+      });
+
       try {
         const res = await fetch(`${API_URL}/api/ferias`, {
           method: "POST",
           body: JSON.stringify({
-            date_from: date.from.toDateString(),
-            date_to: date.to.toDateString(),
+            dates,
             cpf: user.cpf,
           }),
           headers: {
