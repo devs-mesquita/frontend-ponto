@@ -13,6 +13,10 @@ Tabela de Usuários:
     - Atribuição de falta (popup, single date);
     - Atribuição de férias (popup, date range).
     - Consultar Pontos (popup, date range).
+    
+    > General onClick Behavior:
+      > Set the popup.isOpen to true, Set the user to the corresponding user.
+      
 
   TBD - Atribuição de atestado (popup date range, comprovante atestado?);
 */
@@ -25,13 +29,19 @@ import { useAuthUser } from "react-auth-kit";
 import * as React from "react";
 import { useAtom } from "jotai";
 import { notificationAtom, notificationInitialState } from "@/store";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 import type { UserWithSetor, Setor } from "@/types/interfaces";
 
 import ConsultarPontos from "@/components/UserActions/ConsultarPontos";
 import AtribuirFalta from "@/components/UserActions/AtribuirFalta";
 import AtribuirFerias from "@/components/UserActions/AtribuirFerias";
+
+import {
+  MagnifyingGlassIcon,
+  Cross1Icon,
+  StarFilledIcon,
+} from "@radix-ui/react-icons";
 
 import {
   Table,
@@ -43,6 +53,7 @@ import {
 } from "@/components/ui/table";
 
 import TopNotification from "@/components/TopNotification";
+import { PlusIcon } from "lucide-react";
 
 type UserAPIResponse = {
   users: UserWithSetor[];
@@ -149,6 +160,9 @@ export default function Configs() {
   };
   const [consultarPontos, setConsultaPontos] =
     React.useState<ConsultaPontosPopup>(consultaPontosInitialState);
+  const handlePopupConsultarPontos = (user: UserWithSetor) => {
+    setConsultaPontos((st) => ({ ...st, user, isOpen: true }));
+  };
 
   const atribuirFeriasInitialState: AtribuirFeriasPopup = {
     isOpen: false,
@@ -159,6 +173,9 @@ export default function Configs() {
   };
   const [atribuirFerias, setAtribuirFerias] =
     React.useState<AtribuirFeriasPopup>(atribuirFeriasInitialState);
+  const handlePopupAtribuirFerias = (user: UserWithSetor) => {
+    setConsultaPontos((st) => ({ ...st, user, isOpen: true }));
+  };
 
   const atribuirFaltaInitialState: AtribuirFaltaPopup = {
     isOpen: false,
@@ -170,10 +187,13 @@ export default function Configs() {
   const [atribuirFalta, setAtribuirFalta] = React.useState<AtribuirFaltaPopup>(
     atribuirFaltaInitialState,
   );
+  const handlePopupAtribuirFalta = (user: UserWithSetor) => {
+    setConsultaPontos((st) => ({ ...st, user, isOpen: true }));
+  };
 
   return ["Admin", "Super-Admin"].includes(auth()?.user.nivel || "") ? (
     <>
-      <div className="my-4 flex flex-1 flex-col gap-4 font-mono ">
+      <div className="my-4 flex flex-1 flex-col gap-4 font-mono">
         <h1 className="text-center text-slate-200/90">Lista de Usuários</h1>
         <div className="flex flex-col items-center justify-around gap-8 md:flex-row md:gap-4">
           <form
@@ -204,10 +224,18 @@ export default function Configs() {
               </button>
             </div>
           </form>
+          <Link
+            to="/register"
+            title="Registrar novo usuário."
+            className="flex items-center gap-2 rounded bg-green-500/80 px-2 py-1 text-base text-green-50 shadow shadow-black/20 hover:bg-green-600/80"
+          >
+            <PlusIcon className="h-5 w-5" />
+            Novo Usuário
+          </Link>
         </div>
         <div className="mx-4 flex-1 rounded border border-white/20 bg-slate-800 bg-gradient-to-br from-indigo-700/20 to-rose-500/20">
           <Table className="flex-1 shadow shadow-black/20">
-            <TableHeader>
+            <TableHeader className="sticky top-0 bg-slate-700 bg-gradient-to-r from-indigo-700/50 to-rose-700/30">
               <TableRow>
                 <TableHead className="text-center text-white">Nome</TableHead>
                 <TableHead className="text-center text-white">CPF</TableHead>
@@ -221,7 +249,31 @@ export default function Configs() {
                   <TableCell>{user.name}</TableCell>
                   <TableCell>{user.cpf}</TableCell>
                   <TableCell>{user.email}</TableCell>
-                  <TableCell>ACTIONS</TableCell>
+                  <TableCell>
+                    <div className="flex justify-center gap-4">
+                      <button
+                        title="Consultar pontos."
+                        className="rounded bg-cyan-500/80 p-2 text-blue-50 shadow shadow-black/20 hover:bg-cyan-600/80"
+                        onClick={() => handlePopupConsultarPontos(user)}
+                      >
+                        <MagnifyingGlassIcon className="h-5 w-5" />
+                      </button>
+                      <button
+                        title="Atribuir falta."
+                        className="rounded bg-red-500/80 p-2 text-red-50 shadow shadow-black/20 hover:bg-red-600/80"
+                        onClick={() => handlePopupAtribuirFalta(user)}
+                      >
+                        <Cross1Icon className="h-5 w-5" />
+                      </button>
+                      <button
+                        title="Atribuir férias."
+                        className="rounded bg-green-500/80 p-2 text-green-50 shadow shadow-black/20 hover:bg-green-600/80"
+                        onClick={() => handlePopupAtribuirFerias(user)}
+                      >
+                        <StarFilledIcon className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -232,17 +284,20 @@ export default function Configs() {
       {consultarPontos.isOpen && (
         <ConsultarPontos
           user={consultarPontos.user}
-          close={consultarPontos.close}
+          closePopup={consultarPontos.close}
         />
       )}
       {atribuirFerias.isOpen && (
         <AtribuirFerias
           user={atribuirFerias.user}
-          close={atribuirFerias.close}
+          closePopup={atribuirFerias.close}
         />
       )}
       {atribuirFalta.isOpen && (
-        <AtribuirFalta user={atribuirFalta.user} close={atribuirFalta.close} />
+        <AtribuirFalta
+          user={atribuirFalta.user}
+          closePopup={atribuirFalta.close}
+        />
       )}
     </>
   ) : (

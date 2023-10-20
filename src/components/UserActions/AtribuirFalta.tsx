@@ -3,10 +3,13 @@ import type { UserWithSetor } from "@/types/interfaces";
 
 type AtribuirFaltaProps = {
   user: UserWithSetor;
-  close: () => void;
+  closePopup: () => void;
 };
 
-export default function AtribuirFalta({}: AtribuirFaltaProps) {
+export default function AtribuirFalta({
+  closePopup,
+  user,
+}: AtribuirFaltaProps) {
   return ReactDOM.createPortal(
     <>
       <div className="fixed left-1/2 top-1/2 z-40 flex w-72 max-w-full translate-x-[-50%] translate-y-[-50%] flex-col gap-3 rounded bg-slate-700 p-4 sm:w-[30rem] md:w-[36rem] lg:w-[42rem]">
@@ -30,7 +33,7 @@ export default function AtribuirFalta({}: AtribuirFaltaProps) {
       </div>
       <div
         className="fixed z-30 h-screen w-screen bg-black/30 backdrop-blur-sm"
-        onClick={close}
+        onClick={closePopup}
       />
     </>,
     document.querySelector<HTMLDivElement>("#modal")!,
