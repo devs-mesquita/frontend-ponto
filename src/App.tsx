@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import Configs from "./pages/Configs";
 import NotFound from "./pages/NotFound";
 import Users from "./pages/Users";
+import Exports from "./pages/Exports";
 
 export default function App() {
   return (
@@ -36,6 +37,14 @@ export default function App() {
             element={
               <RequireAuth loginPath="/login">
                 <Configs />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="exports"
+            element={
+              <RequireAuth loginPath="/login">
+                <Exports />
               </RequireAuth>
             }
           />

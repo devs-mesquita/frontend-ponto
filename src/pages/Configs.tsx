@@ -2,7 +2,7 @@
 // - Criação de feriado/ponto facultativo (cpf = "sistema");
 // - Lista de Feriados/Pontos Facultativos criados.
 
-//import { useAuthUser } from "react-auth-kit";
+import { useAuthUser } from "react-auth-kit";
 import * as React from "react";
 import {
   CalendarIcon,
@@ -14,6 +14,7 @@ import {
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { ptBR } from "date-fns/locale";
+import { Navigate } from "react-router-dom";
 
 import { useAtom } from "jotai";
 import { notificationAtom, notificationInitialState } from "@/store";
@@ -79,7 +80,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Configs() {
   document.title = "Configurações";
-  //const auth = useAuthUser();
+  const auth = useAuthUser();
 
   const [notification, setNotification] = useAtom(notificationAtom);
 
@@ -278,7 +279,7 @@ export default function Configs() {
     }
   };
 
-  return (
+  return auth()?.user.nivel === "Super-Admin" ? (
     <>
       <div className="my-4 flex flex-1 flex-col gap-4 font-mono ">
         <h1 className="text-center text-slate-200/90">
@@ -495,5 +496,7 @@ export default function Configs() {
       )}
       {notification.message && <TopNotification />}
     </>
+  ) : (
+    <Navigate to="/" />
   );
 }

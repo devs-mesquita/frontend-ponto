@@ -18,9 +18,15 @@ Tabela de Usuários:
 
 import { useAuthUser } from "react-auth-kit";
 import * as React from "react";
-
 import { useAtom } from "jotai";
 import { notificationAtom, notificationInitialState } from "@/store";
+import { Navigate } from "react-router-dom";
+
+import type { UserWithSetor, Setor } from "@/types/interfaces";
+
+import ConsultarPontos from "@/components/UserActions/ConsultarPontos";
+import AtribuirFalta from "@/components/UserActions/AtribuirFalta";
+import AtribuirFerias from "@/components/UserActions/AtribuirFerias";
 
 import {
   Table,
@@ -33,26 +39,28 @@ import {
 
 import TopNotification from "@/components/TopNotification";
 
-type Setor = {
-  id: number;
-  nome: string;
-  soma_entrada: number;
-  soma_saida: number;
-};
-
-type UserWithSetor = {
-  id: number;
-  name: string;
-  email: string;
-  nivel: "Super-Admin" | "Admin" | "User";
-  cpf: string;
-  setor_id: number;
-  setor: Setor;
-};
-
 type UserAPIResponse = {
   users: UserWithSetor[];
 };
+
+type AtribuirFeriasPopup = {
+  close: () => void;
+} & (
+  | { isOpen: true; user: UserWithSetor }
+  | { isOpen: false; user: undefined }
+);
+type ConsultaPontosPopup = {
+  close: () => void;
+} & (
+  | { isOpen: true; user: UserWithSetor }
+  | { isOpen: false; user: undefined }
+);
+type AtribuirFaltaPopup = {
+  close: () => void;
+} & (
+  | { isOpen: true; user: UserWithSetor }
+  | { isOpen: false; user: undefined }
+);
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -127,7 +135,38 @@ export default function Configs() {
     getSetores();
   }, []);
 
-  return (
+  const consultaPontosInitialState: ConsultaPontosPopup = {
+    isOpen: false,
+    close: () => {
+      setConsultaPontos((st) => ({ ...st, user: undefined, isOpen: false }));
+    },
+    user: undefined,
+  };
+  const [consultarPontos, setConsultaPontos] =
+    React.useState<ConsultaPontosPopup>(consultaPontosInitialState);
+
+  const atribuirFeriasInitialState: AtribuirFeriasPopup = {
+    isOpen: false,
+    close: () => {
+      setAtribuirFerias((st) => ({ ...st, user: undefined, isOpen: false }));
+    },
+    user: undefined,
+  };
+  const [atribuirFerias, setAtribuirFerias] =
+    React.useState<AtribuirFeriasPopup>(atribuirFeriasInitialState);
+
+  const atribuirFaltaInitialState: AtribuirFaltaPopup = {
+    isOpen: false,
+    close: () => {
+      setAtribuirFalta((st) => ({ ...st, user: undefined, isOpen: false }));
+    },
+    user: undefined,
+  };
+  const [atribuirFalta, setAtribuirFalta] = React.useState<AtribuirFaltaPopup>(
+    atribuirFaltaInitialState,
+  );
+
+  return ["Admin", "Super-Admin"].includes(auth()?.user.nivel || "") ? (
     <>
       <div className="my-4 flex flex-1 flex-col gap-4 font-mono ">
         <h1 className="text-center text-slate-200/90">Lista de Usuários</h1>
@@ -185,6 +224,23 @@ export default function Configs() {
         </div>
       </div>
       {notification.message && <TopNotification />}
+      {consultarPontos.isOpen && (
+        <ConsultarPontos
+          user={consultarPontos.user}
+          close={consultarPontos.close}
+        />
+      )}
+      {atribuirFerias.isOpen && (
+        <AtribuirFerias
+          user={atribuirFerias.user}
+          close={atribuirFerias.close}
+        />
+      )}
+      {atribuirFalta.isOpen && (
+        <AtribuirFalta user={atribuirFalta.user} close={atribuirFalta.close} />
+      )}
     </>
+  ) : (
+    <Navigate to="/" />
   );
 }
