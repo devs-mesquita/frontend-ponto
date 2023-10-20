@@ -118,6 +118,7 @@ export default function ConsultarPontos({
           },
           {} as Record<string, any>,
         );
+
         setRegistros(registrosTable);
       } catch (error) {
         console.log(error);

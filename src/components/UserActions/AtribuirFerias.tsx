@@ -47,7 +47,7 @@ export default function AtribuirFerias({
       });
 
       try {
-        const res = await fetch(`${API_URL}/api/ferias`, {
+        const res = await fetch(`${API_URL}/api/registro/ferias`, {
           method: "POST",
           body: JSON.stringify({
             dates,
@@ -63,14 +63,13 @@ export default function AtribuirFerias({
           throw err;
         }
 
-        const data = await res.json();
-        console.log(data);
-
         setLoading(false);
         setNotification({
           message: "Registros criados com sucesso.",
           type: "success",
         });
+        closePopup();
+
       } catch (error) {
         console.log(error);
 
