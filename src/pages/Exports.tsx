@@ -1,7 +1,8 @@
-// Exportar PDFs:
-// - Pontos por Usuário;
-// - Pontos por Setor;
-
+/*
+Exportar PDFs:
+  - Pontos por Usuário;
+  - Pontos por Setor;
+*/
 import { useAuthUser } from "react-auth-kit";
 import * as React from "react";
 import { useAtom } from "jotai";
