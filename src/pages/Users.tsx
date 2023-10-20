@@ -174,7 +174,7 @@ export default function Configs() {
   const [atribuirFerias, setAtribuirFerias] =
     React.useState<AtribuirFeriasPopup>(atribuirFeriasInitialState);
   const handlePopupAtribuirFerias = (user: UserWithSetor) => {
-    setConsultaPontos((st) => ({ ...st, user, isOpen: true }));
+    setAtribuirFerias((st) => ({ ...st, user, isOpen: true }));
   };
 
   const atribuirFaltaInitialState: AtribuirFaltaPopup = {
@@ -188,7 +188,7 @@ export default function Configs() {
     atribuirFaltaInitialState,
   );
   const handlePopupAtribuirFalta = (user: UserWithSetor) => {
-    setConsultaPontos((st) => ({ ...st, user, isOpen: true }));
+    setAtribuirFalta((st) => ({ ...st, user, isOpen: true }));
   };
 
   return ["Admin", "Super-Admin"].includes(auth()?.user.nivel || "") ? (
