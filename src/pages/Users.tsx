@@ -10,15 +10,15 @@ Tabela de Usuários:
       - Admin: Próprio setor.
 
   — Ações:
-    - Atribuição de falta (popup, single date);
-    - Atribuição de férias (popup, date range).
-    - Consultar Pontos (popup, date range).
-    
-    > General onClick Behavior:
-      > Set the popup.isOpen to true, Set the user to the corresponding user.
-      
+    > Admin:
+      > Popups:
+        - onClick Action > Set the popup.isOpen to true, Set the user to the corresponding user.
+        - Atribuição de falta (popup, single date);
+        - Atribuição de férias (popup, date range).
+        - Consultar Pontos (popup, date range);
+        TBD - Atribuição de atestado (popup date range, comprovante atestado?);
 
-  TBD - Atribuição de atestado (popup date range, comprovante atestado?);
+        - Resetar Senha (confirmDialog).
 */
 
 // Configurações/Administração:
@@ -39,7 +39,7 @@ import AtribuirFerias from "@/components/UserActions/AtribuirFerias";
 
 import {
   MagnifyingGlassIcon,
-  Cross1Icon,
+  ExclamationTriangleIcon,
   StarFilledIcon,
 } from "@radix-ui/react-icons";
 
@@ -263,7 +263,7 @@ export default function Configs() {
                         className="rounded bg-red-500/80 p-2 text-red-50 shadow shadow-black/20 hover:bg-red-600/80"
                         onClick={() => handlePopupAtribuirFalta(user)}
                       >
-                        <Cross1Icon className="h-5 w-5" />
+                        <ExclamationTriangleIcon className="h-5 w-5" />
                       </button>
                       <button
                         title="Atribuir férias."
