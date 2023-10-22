@@ -3,7 +3,7 @@ Exportar PDFs:
   - Pontos por Usuário;
   - Pontos por Setor;
 */
-import { useAuthUser } from "react-auth-kit";
+import { useAuthUser, useAuthHeader } from "react-auth-kit";
 import * as React from "react";
 import { useAtom } from "jotai";
 import { notificationAtom, notificationInitialState } from "@/store";
@@ -46,10 +46,39 @@ const API_URL = import.meta.env.VITE_API_URL;
 export default function Exports() {
   document.title = "Exportações";
   const auth = useAuthUser();
+  const authHeader = useAuthHeader();
 
   const [notification, setNotification] = useAtom(notificationAtom);
   const [loading, setLoading] = React.useState<boolean>(false);
-  
+
+  React.useEffect(() => {
+    const backendTest = async () => {
+      console.log(authHeader());
+      try {
+        const res = await fetch(`${API_URL}/api/test`, {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            Authorization: authHeader(),
+          },
+        });
+
+        if (!res.ok) {
+          throw await res.json();
+        }
+
+        console.log("-- Success --");
+        const data = await res.json();
+        console.log(data);
+      } catch (error) {
+        console.log("-- There was an error --");
+        console.error(error);
+      }
+    };
+
+    backendTest();
+  }, []);
+
   /*const [setores, setSetores] = React.useState<Setor[]>([]);
   const [setorID, setSetorID] = React.useState<string>("");
   const [users, setUsers] = React.useState<UserWithSetor[]>([]);

@@ -11,7 +11,7 @@ type LoginAPIResponse = {
   authorization: {
     token: string;
     type: string;
-    expiresIn?: number;
+    expires_in: number;
   };
   user: {
     name: string;
@@ -70,8 +70,8 @@ export default function Login() {
 
       signIn({
         token: data.authorization.token,
-        tokenType: "Bearer",
-        expiresIn: 60 * 60 * 24 * 365.25,
+        tokenType: data.authorization.type,
+        expiresIn: data.authorization.expires_in,
         authState: { user: data.user },
       });
 
