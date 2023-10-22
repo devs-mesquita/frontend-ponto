@@ -1,4 +1,4 @@
-import { useAuthUser } from "react-auth-kit";
+import { useAuthHeader, useAuthUser } from "react-auth-kit";
 import * as React from "react";
 import {
   CalendarIcon,
@@ -77,6 +77,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 export default function Configs() {
   document.title = "Configurações";
   const auth = useAuthUser();
+  const authHeader = useAuthHeader();
 
   const [notification, setNotification] = useAtom(notificationAtom);
 
@@ -102,6 +103,12 @@ export default function Configs() {
               to: date.to.toDateString(),
               cpf: "sistema",
             }),
+          {
+            headers: {
+              Accept: "application/json",
+              Authorization: authHeader(),
+            },
+          },
         );
 
         if (!res.ok) {
@@ -166,7 +173,8 @@ export default function Configs() {
             cpf: "sistema",
           }),
           headers: {
-            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: authHeader(),
           },
         });
 
@@ -246,7 +254,8 @@ export default function Configs() {
           cpf: "sistema",
         }),
         headers: {
-          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: authHeader(),
         },
       });
 

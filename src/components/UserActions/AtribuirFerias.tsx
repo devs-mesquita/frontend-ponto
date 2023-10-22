@@ -12,6 +12,7 @@ import { useAtom } from "jotai";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { differenceInDays, addDays } from "date-fns";
+import { useAuthHeader } from "react-auth-kit";
 
 type AtribuirFeriasProps = {
   user: UserWithSetor;
@@ -25,6 +26,8 @@ export default function AtribuirFerias({
   closePopup,
   user,
 }: AtribuirFeriasProps) {
+  const authHeader = useAuthHeader();
+  
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: undefined,
     to: undefined,
@@ -54,7 +57,8 @@ export default function AtribuirFerias({
             cpf: user.cpf,
           }),
           headers: {
-            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: authHeader()
           },
         });
 

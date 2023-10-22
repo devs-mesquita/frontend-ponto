@@ -9,6 +9,7 @@ import { notificationAtom, notificationInitialState } from "@/store";
 import { useAtom } from "jotai";
 
 import { Calendar } from "@/components/ui/calendar";
+import { useAuthHeader } from "react-auth-kit";
 
 type AtribuirFaltaProps = {
   user: UserWithSetor;
@@ -22,6 +23,7 @@ export default function AtribuirFalta({
   closePopup,
   user,
 }: AtribuirFaltaProps) {
+  const authHeader = useAuthHeader();
   const [date, setDate] = React.useState<Date | undefined>(undefined);
 
   const setNotification = useAtom(notificationAtom)[1];
@@ -42,7 +44,8 @@ export default function AtribuirFalta({
             cpf: user.cpf,
           }),
           headers: {
-            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: authHeader()
           },
         });
 

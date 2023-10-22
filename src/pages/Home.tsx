@@ -1,4 +1,4 @@
-import { useAuthUser } from "react-auth-kit";
+import { useAuthHeader, useAuthUser } from "react-auth-kit";
 import * as React from "react";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
@@ -62,6 +62,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 export default function Home() {
   document.title = "Ponto Eletrônico";
   const auth = useAuthUser();
+  const authHeader = useAuthHeader();
 
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: undefined,
@@ -102,6 +103,12 @@ export default function Home() {
                   ? cpf.replace("-", "").replace(".", "").replace(".", "")
                   : auth()?.user.cpf || "",
             }),
+          {
+            headers: {
+              Accept: "application/json",
+              Authorization: authHeader(),
+            },
+          },
         );
 
         if (!res.ok) {

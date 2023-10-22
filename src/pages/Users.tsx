@@ -6,7 +6,7 @@ Tabela de Usuários:
 Ações:
   - Resetar Senha (confirmDialog).
 */
-import { useAuthUser } from "react-auth-kit";
+import { useAuthHeader, useAuthUser } from "react-auth-kit";
 import * as React from "react";
 import { useAtom } from "jotai";
 import { notificationAtom, notificationInitialState } from "@/store";
@@ -64,6 +64,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 export default function Configs() {
   document.title = "Usuários";
   const auth = useAuthUser();
+  const authHeader = useAuthHeader();
 
   const [notification, setNotification] = useAtom(notificationAtom);
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -76,7 +77,13 @@ export default function Configs() {
     if (setorID) {
       setLoading(true);
       try {
-        const res = await fetch(`${API_URL}/api/users/${setorID}`);
+        const res = await fetch(`${API_URL}/api/users/${setorID}`, {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            Authorization: authHeader(),
+          },
+        });
 
         if (!res.ok) {
           const err = await res.json();
@@ -112,7 +119,13 @@ export default function Configs() {
     const getSetores = async () => {
       if (auth()?.user.nivel === "Super-Admin") {
         try {
-          const res = await fetch(`${API_URL}/api/setores`);
+          const res = await fetch(`${API_URL}/api/setores`, {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+              Authorization: authHeader(),
+            },
+          });
 
           if (!res.ok) {
             const err = await res.json();

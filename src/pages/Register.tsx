@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuthUser } from "react-auth-kit";
+import { useAuthUser, useAuthHeader } from "react-auth-kit";
 import InputMask from "react-input-mask";
 import { Navigate } from "react-router-dom";
 
@@ -35,6 +35,7 @@ export default function Register() {
   document.title = "Registrar Usuário";
 
   const auth = useAuthUser();
+  const authHeader = useAuthHeader();
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -74,7 +75,8 @@ export default function Register() {
           cpf: cleanCPF,
         }),
         headers: {
-          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: authHeader()
         },
       });
 
@@ -101,7 +103,13 @@ export default function Register() {
   useEffect(() => {
     const getSetores = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/setores`);
+        const res = await fetch(`${API_URL}/api/setores`, {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            Authorization: authHeader()
+          }
+        });
 
         if (!res.ok) {
           const err = await res.json();

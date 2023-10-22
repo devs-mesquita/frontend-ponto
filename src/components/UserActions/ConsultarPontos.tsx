@@ -30,6 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useAuthHeader } from "react-auth-kit";
 
 type Registro = {
   id: number;
@@ -75,6 +76,7 @@ export default function ConsultarPontos({
   user,
 }: ConsultarPontosProps) {
   const setNotification = useAtom(notificationAtom)[1];
+  const authHeader = useAuthHeader();
 
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: undefined, //new Date(),
@@ -98,6 +100,12 @@ export default function ConsultarPontos({
               to: date.to.toDateString(),
               cpf: user.cpf,
             }),
+          {
+            headers: {
+              Accept: "application/json",
+              Authorization: authHeader(),
+            },
+          },
         );
 
         if (!res.ok) {
@@ -182,7 +190,8 @@ export default function ConsultarPontos({
           cpf: user.cpf,
         }),
         headers: {
-          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: authHeader(),
         },
       });
 
