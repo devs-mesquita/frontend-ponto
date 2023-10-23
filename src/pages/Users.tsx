@@ -87,7 +87,6 @@ export default function Configs() {
 
         if (!res.ok) {
           const err = await res.json();
-          console.log(err);
           throw err;
         }
 
@@ -97,7 +96,7 @@ export default function Configs() {
         const users = data.users;
         setUsers(users);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         setNotification({
           message: "Ocorreu um erro.",
           type: "error",

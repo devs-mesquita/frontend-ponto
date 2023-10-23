@@ -80,8 +80,8 @@ export default function Login() {
         token: data.authorization.token,
         refreshToken: data.authorization.token,
         tokenType: data.authorization.type,
-        expiresIn: 60 * 60 * 24 * 365.25,
-        refreshTokenExpireIn: 60 * 60 * 24 * 365.25,
+        expiresIn: data.authorization.expires_in,
+        refreshTokenExpireIn: data.authorization.expires_in,
         authState: { user: data.user },
       });
 

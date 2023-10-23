@@ -67,7 +67,7 @@ export default function Navbar() {
               {auth()?.user.nivel === "Super-Admin" && (
                 <>
                   <NavLink
-                    to="/configs"
+                    to="/feriados"
                     className={({ isActive }) =>
                       `${
                         isActive
@@ -76,10 +76,22 @@ export default function Navbar() {
                       }`
                     }
                   >
-                    Configurações
+                    Feriados
                   </NavLink>
                 </>
               )}
+              <NavLink
+                to="/configs"
+                className={({ isActive }) =>
+                  `${
+                    isActive
+                      ? "text-white"
+                      : "text-white/60 hover:text-white/80"
+                  }`
+                }
+              >
+                Configurações
+              </NavLink>
             </div>
             <button
               className="rounded bg-slate-500/40 bg-gradient-to-r px-4 py-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white"

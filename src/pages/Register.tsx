@@ -76,7 +76,7 @@ export default function Register() {
         }),
         headers: {
           Accept: "application/json",
-          Authorization: authHeader()
+          Authorization: authHeader(),
         },
       });
 
@@ -107,8 +107,8 @@ export default function Register() {
           method: "GET",
           headers: {
             Accept: "application/json",
-            Authorization: authHeader()
-          }
+            Authorization: authHeader(),
+          },
         });
 
         if (!res.ok) {

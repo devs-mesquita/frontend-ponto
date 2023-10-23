@@ -43,19 +43,19 @@ const results = {
   },
   ferias: {
     type: "warning",
-    message: "Registro de férias existente nesta data."
+    message: "Registro de férias existente nesta data.",
   },
   feriado: {
     type: "warning",
-    message: "Registro de feriado existente nesta data."
+    message: "Registro de feriado existente nesta data.",
   },
   falta: {
     type: "warning",
-    message: "Registro de falta existente nesta data."
+    message: "Registro de falta existente nesta data.",
   },
   atestado: {
     type: "warning",
-    message: "Registro de atestado existente nesta data."
+    message: "Registro de atestado existente nesta data.",
   },
 } as const;
 
@@ -143,7 +143,7 @@ export default function PontoEletronico() {
         body: formData,
         headers: {
           Accept: "application/json",
-          "Authorization": authHeader(),
+          Authorization: authHeader(),
           "X-API-KEY": API_KEY,
         },
       });
@@ -158,8 +158,6 @@ export default function PontoEletronico() {
       setCPF("");
       camera.srcObject = null;
       setLoading(false);
-
-      console.log(res);
 
       if (res.resultado === "ok") {
         setMessage({

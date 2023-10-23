@@ -6,6 +6,7 @@ import PontoEletronico from "./pages/PontoEletronico";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
+import Feriados from "./pages/Feriados";
 import Configs from "./pages/Configs";
 import NotFound from "./pages/NotFound";
 import Users from "./pages/Users";
@@ -37,6 +38,14 @@ export default function App() {
             element={
               <RequireAuth loginPath="/login">
                 <Configs />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="feriados"
+            element={
+              <RequireAuth loginPath="/login">
+                <Feriados />
               </RequireAuth>
             }
           />
