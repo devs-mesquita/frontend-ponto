@@ -49,14 +49,22 @@ export default function Login() {
 
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
+    if (!form.email && !form.password) {
+      return;
+    }
+
     setMessage(messageInit);
     setLoading(true);
 
     try {
       const res = await fetch(`${API_URL}/api/login`, {
         method: "POST",
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+        }),
         headers: {
+          "Content-Type": "application/json",
           Accept: "application/json",
         },
       });
@@ -70,13 +78,16 @@ export default function Login() {
 
       signIn({
         token: data.authorization.token,
+        refreshToken: data.authorization.token,
         tokenType: data.authorization.type,
-        expiresIn: data.authorization.expires_in,
+        expiresIn: 60 * 60 * 24 * 365.25,
+        refreshTokenExpireIn: 60 * 60 * 24 * 365.25,
         authState: { user: data.user },
       });
 
       navigate("/");
     } catch (error) {
+      console.error(error);
       if (error instanceof Error) {
         if (error.message === "Unauthorized") {
           setMessage({

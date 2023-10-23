@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuthUser } from "react-auth-kit";
+import { useAuthUser, useAuthHeader } from "react-auth-kit";
 import { Navigate } from "react-router-dom";
 import InputMask from "react-input-mask";
 import dataURLtoBlob from "../utils/dataURLtoBlob";
@@ -41,6 +41,22 @@ const results = {
     type: "error",
     message: "Ocorreu um erro.",
   },
+  ferias: {
+    type: "warning",
+    message: "Registro de férias existente nesta data."
+  },
+  feriado: {
+    type: "warning",
+    message: "Registro de feriado existente nesta data."
+  },
+  falta: {
+    type: "warning",
+    message: "Registro de falta existente nesta data."
+  },
+  atestado: {
+    type: "warning",
+    message: "Registro de atestado existente nesta data."
+  },
 } as const;
 
 const messages = {
@@ -54,6 +70,7 @@ export default function PontoEletronico() {
   document.title = "Ponto Eletrônico";
 
   const auth = useAuthUser();
+  const authHeader = useAuthHeader();
 
   const [cpf, setCPF] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -126,6 +143,7 @@ export default function PontoEletronico() {
         body: formData,
         headers: {
           Accept: "application/json",
+          "Authorization": authHeader(),
           "X-API-KEY": API_KEY,
         },
       });
@@ -140,6 +158,8 @@ export default function PontoEletronico() {
       setCPF("");
       camera.srcObject = null;
       setLoading(false);
+
+      console.log(res);
 
       if (res.resultado === "ok") {
         setMessage({

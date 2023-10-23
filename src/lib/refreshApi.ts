@@ -39,7 +39,7 @@ const refreshApi = createRefresh({
         isSuccess: true,
         newAuthToken: data.authorization.token,
         newAuthTokenExpireIn: data.authorization.expires_in,
-        newRefreshTokenExpiresIn: data.authorization.expires_in,
+        newRefreshTokenExpiresIn: 60 * 60 * 24 * 365.25,
         newAuthUserState: data.user,
         newRefreshToken: data.authorization.token,
       };
