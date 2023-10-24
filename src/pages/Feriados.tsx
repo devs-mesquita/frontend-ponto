@@ -105,6 +105,7 @@ export default function Feriados() {
             }),
           {
             headers: {
+              "Content-Type": "application/json",
               Accept: "application/json",
               Authorization: authHeader(),
             },
@@ -173,6 +174,7 @@ export default function Feriados() {
             cpf: "sistema",
           }),
           headers: {
+            "Content-Type": "application/json",
             Accept: "application/json",
             Authorization: authHeader(),
           },
@@ -250,6 +252,7 @@ export default function Feriados() {
           cpf: "sistema",
         }),
         headers: {
+          "Content-Type": "application/json",
           Accept: "application/json",
           Authorization: authHeader(),
         },

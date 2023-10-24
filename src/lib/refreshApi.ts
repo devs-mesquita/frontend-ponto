@@ -23,6 +23,7 @@ const refreshApi = createRefresh({
       const res = await fetch(`${API_URL}/api/login`, {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Accept: "application/json",
           Authorization: authHeader(),
         },

@@ -75,6 +75,7 @@ export default function Register() {
           cpf: cleanCPF,
         }),
         headers: {
+          "Content-Type": "application/json",
           Accept: "application/json",
           Authorization: authHeader(),
         },
@@ -106,6 +107,7 @@ export default function Register() {
         const res = await fetch(`${API_URL}/api/setores`, {
           method: "GET",
           headers: {
+            "Content-Type": "application/json",
             Accept: "application/json",
             Authorization: authHeader(),
           },

@@ -44,6 +44,7 @@ export default function AtribuirFalta({
             cpf: user.cpf,
           }),
           headers: {
+            "Content-Type": "application/json",
             Accept: "application/json",
             Authorization: authHeader()
           },

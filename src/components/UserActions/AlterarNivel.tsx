@@ -3,63 +3,62 @@ import ReactDOM from "react-dom";
 import type { UserWithSetor } from "@/types/interfaces";
 
 import errorFromApi from "@/utils/errorFromAPI";
-import { DateRange } from "react-day-picker";
-import { ptBR } from "date-fns/locale";
 
 import { notificationAtom, notificationInitialState } from "@/store";
 import { useAtom } from "jotai";
 
-import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import { differenceInDays, addDays } from "date-fns";
 import { useAuthHeader } from "react-auth-kit";
 
-type AtribuirFeriasProps = {
+type AtribuirFaltaProps = {
   user: UserWithSetor;
   closePopup: () => void;
 };
-type Resultado = "existente";
+type Resultado = "unauthorized" | "not-found" | "ok";
+const notifications = {
+  unauthorized: {
+    message: "Permissão negada.",
+    type: "error",
+  },
+  "not-found": {
+    message: "O usuário não foi encontrado.",
+    type: "error",
+  },
+  error: {
+    message: "Ocorreu um erro.",
+    type: "error",
+  },
+  ok: {
+    message: "Nível atribuído com sucesso.",
+    type: "success",
+  },
+} as const;
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function AtribuirFerias({
-  closePopup,
-  user,
-}: AtribuirFeriasProps) {
+export default function AlterarNivel({ closePopup, user }: AtribuirFaltaProps) {
   const authHeader = useAuthHeader();
-  
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: undefined,
-    to: undefined,
-  });
+  const [nivel, setNivel] = React.useState<string>(user.nivel);
 
   const setNotification = useAtom(notificationAtom)[1];
   const [loading, setLoading] = React.useState<boolean>(false);
 
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
-    if (date?.from && date.to) {
+    if (nivel) {
       setLoading(true);
       setNotification(notificationInitialState);
 
-      const startDate = date.from;
-      const endDate = date.to;
-      const daysQuantity = differenceInDays(endDate, startDate) + 1;
-      const dates = Array.from({ length: daysQuantity }, (_value, index) => {
-        return addDays(startDate, index).toDateString();
-      });
-
       try {
-        const res = await fetch(`${API_URL}/api/registro/ferias`, {
+        const res = await fetch(`${API_URL}/api/nivel`, {
           method: "POST",
           body: JSON.stringify({
-            dates,
-            cpf: user.cpf,
+            nivel: user.nivel,
+            user_id: user.id,
           }),
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
-            Authorization: authHeader()
+            Authorization: authHeader(),
           },
         });
 
@@ -68,11 +67,10 @@ export default function AtribuirFerias({
           throw err;
         }
 
+        const data: { resultado: Resultado } = await res.json();
+
         setLoading(false);
-        setNotification({
-          message: "Registros criados com sucesso.",
-          type: "success",
-        });
+        setNotification(notifications[data.resultado]);
         closePopup();
       } catch (error) {
         console.log(error);
@@ -82,14 +80,13 @@ export default function AtribuirFerias({
             message: "Ocorreu um erro.",
             type: "error",
           });
+        }
+
+        if (error instanceof Error) {
+          setNotification(notifications["error"]);
         } else if (errorFromApi<{ resultado: Resultado }>(error, "resultado")) {
           const resultado = error.resultado as Resultado;
-          if (resultado === "existente") {
-            setNotification({
-              message: "Um registro já existe em alguma data selecionada.",
-              type: "error",
-            });
-          }
+          setNotification(notifications[resultado]);
         }
 
         setLoading(false);
@@ -107,38 +104,29 @@ export default function AtribuirFerias({
       <div className="fixed left-1/2 top-1/2 z-30 flex w-[28rem] translate-x-[-50%] translate-y-[-50%] flex-col gap-3 rounded bg-slate-700 bg-gradient-to-br from-indigo-500/40 to-rose-500/40 p-4 md:w-[40rem] lg:w-[40rem]">
         <div className="my-4 flex h-full flex-1 flex-col gap-4 font-mono">
           <h2 className="text-center text-slate-200/90">
-            Atribuir férias para {briefUserName}
+            Alterar nível de {briefUserName}
           </h2>
           <form
-            className="flex flex-col items-center justify-center gap-4"
+            className="flex-2 flex flex-col items-center justify-center gap-2"
             onSubmit={handleSubmit}
           >
-            <div
-              className={cn(
-                "dark grid gap-2 rounded bg-slate-900 bg-gradient-to-br from-indigo-700/60 to-rose-500/60",
-              )}
+            <select
+              name="nivel"
+              value={nivel}
+              onChange={(evt) => setNivel(evt.target.value)}
             >
-              <Calendar
-                className="dark rounded text-white shadow shadow-black/30"
-                initialFocus
-                mode="range"
-                defaultMonth={date?.from}
-                selected={date}
-                onSelect={setDate}
-                numberOfMonths={2}
-                max={31}
-                locale={ptBR}
-              />
+              <option value="User">Usuário</option>
+              <option value="Admin">Administrador</option>
+              <option value="Super-Admin">Super Administrador</option>
+            </select>
+            <div className="flex items-center gap-4">
+              <button
+                disabled={loading}
+                className="rounded bg-slate-500/40 bg-gradient-to-r px-4 py-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white disabled:bg-slate-500/10"
+              >
+                {loading ? "Carregando..." : "Atribuir"}
+              </button>
             </div>
-            <span className="text-white">
-              Selecione o período (máximo: 31 dias).
-            </span>
-            <button
-              disabled={loading}
-              className="rounded bg-slate-500/40 bg-gradient-to-r px-4 py-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white disabled:bg-slate-500/10"
-            >
-              {loading ? "Carregando..." : "Atribuir"}
-            </button>
           </form>
         </div>
       </div>

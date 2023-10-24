@@ -190,6 +190,7 @@ export default function ConsultarPontos({
           cpf: user.cpf,
         }),
         headers: {
+          "Content-Type": "application/json",
           Accept: "application/json",
           Authorization: authHeader(),
         },
