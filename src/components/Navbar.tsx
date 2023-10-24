@@ -35,7 +35,7 @@ export default function Navbar() {
             Home
           </NavLink>
           <div className="ml-auto flex flex-col-reverse items-end gap-4 py-4 md:flex-row md:items-center md:gap-16 md:py-0">
-            <div className="ml-auto flex items-center gap-8">
+            <div className="ml-auto flex flex-col items-center gap-8 md:flex-row">
               {["Super-Admin", "Admin"].includes(auth()?.user.nivel || "") && (
                 <>
                   <NavLink
