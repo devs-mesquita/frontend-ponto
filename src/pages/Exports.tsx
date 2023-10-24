@@ -13,6 +13,7 @@ import { format, addHours } from "date-fns";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { DateRange } from "react-day-picker";
 import { ptBR } from "date-fns/locale";
+import exportPDF from "@/utils/exportPDF";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ import InputMask from "react-input-mask";
 
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { UserWithSetor } from "@/types/interfaces";
 
 type Setor = {
   id: number;
@@ -66,6 +68,7 @@ type FilteredRegistro = {
 
 type RegistroAPIResponse = {
   registros: Registro[];
+  user: UserWithSetor;
 };
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -127,7 +130,7 @@ export default function Exports() {
     evt: React.FormEvent<HTMLFormElement>,
   ) => {
     evt.preventDefault();
-    if (date?.from && date.to && cpf) {
+    if (date?.from && date?.to && cpf) {
       setLoading(true);
       const cleanCPF = cpf.replace("-", "").replace(".", "").replace(".", "");
       try {
@@ -155,7 +158,7 @@ export default function Exports() {
         const data: RegistroAPIResponse = await res.json();
         setLoading(false);
 
-        const registros = data.registros;
+        const { registros, user } = data;
 
         const registrosTable = registros.reduce(
           (lista, registro) => {
@@ -172,90 +175,9 @@ export default function Exports() {
           {} as Record<string, any>,
         );
 
-        const doc = new jsPDF();
-
-        autoTable(doc, {
-          head: [["Data", "Entrada", "Ini. Interv.", "Fim. Interv"]],
-          body: Object.keys(registrosTable).map((dateKey) => {
-            const pontoDate = format(
-              new Date(`${dateKey} 12:00:00`),
-              "dd/MM - EEEEEE",
-              {
-                locale: ptBR,
-              },
-            );
-
-            if (registrosTable[dateKey]?.ferias) {
-              return [pontoDate, "FÉRIAS", "FÉRIAS", "FÉRIAS", "FÉRIAS"];
-            }
-            if (registrosTable[dateKey]?.feriado) {
-              return [pontoDate, "FERIADO", "FERIADO", "FERIADO", "FERIADO"];
-            }
-            if (registrosTable[dateKey]?.facultativo) {
-              return [
-                pontoDate,
-                "FACULTATIVO",
-                "FACULTATIVO",
-                "FACULTATIVO",
-                "FACULTATIVO",
-              ];
-            }
-            if (registrosTable[dateKey]?.atestado) {
-              return [
-                pontoDate,
-                "ATESTADO",
-                "ATESTADO",
-                "ATESTADO",
-                "ATESTADO",
-              ];
-            }
-            if (registrosTable[dateKey]?.falta) {
-              return [pontoDate, "FALTA", "FALTA", "FALTA", "FALTA"];
-            }
-            return [
-              pontoDate,
-              registrosTable[dateKey]?.entrada
-                ? addHours(
-                    new Date(registrosTable[dateKey]?.entrada || ""),
-                    auth()?.user.setor.soma_entrada || 0,
-                  ).toLocaleTimeString("pt-BR", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "---",
-              registrosTable[dateKey]?.["inicio-intervalo"]
-                ? new Date(
-                    registrosTable[dateKey]?.["inicio-intervalo"] || "",
-                  ).toLocaleTimeString("pt-BR", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "---",
-              registrosTable[dateKey]?.["fim-intervalo"]
-                ? new Date(
-                    registrosTable[dateKey]?.["fim-intervalo"] || "",
-                  ).toLocaleTimeString("pt-BR", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "---",
-              registrosTable[dateKey]?.saida
-                ? addHours(
-                    new Date(registrosTable[dateKey]?.saida || ""),
-                    new Date(registrosTable[dateKey]?.saida || "").getDay() ===
-                      5
-                      ? 0
-                      : auth()?.user.setor.soma_saida || 0,
-                  ).toLocaleTimeString("pt-BR", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "---",
-            ];
-          }),
-        });
-
-        doc.save(`${format(new Date(), "EEEE-mm-dd")}_${cleanCPF}_.pdf`);
+        if (date.to && date.from) {
+          exportPDF(registrosTable, user, { from: date.from, to: date.to });
+        }
       } catch (error) {
         console.log(error);
         setLoading(false);
@@ -318,7 +240,7 @@ export default function Exports() {
             </PopoverContent>
           </Popover>
         </div>
-        <div className="m-4 mt-8 flex flex-1 flex-col items-center md:items-start justify-around rounded border p-8 md:flex-row">
+        <div className="m-4 mt-8 flex flex-1 flex-col items-center justify-around rounded border p-8 md:flex-row md:items-start">
           <form
             className="flex flex-col items-center justify-center gap-4"
             onSubmit={handleSubmitExportUserPontos}

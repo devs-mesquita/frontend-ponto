@@ -24,6 +24,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import exportPDF from "@/utils/exportPDF";
+import { UserWithSetor } from "@/types/interfaces";
 
 type Registro = {
   id: number;
@@ -55,6 +57,7 @@ type FilteredRegistro = {
 
 type RegistroAPIResponse = {
   registros: Registro[];
+  user: UserWithSetor;
 };
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -68,6 +71,10 @@ export default function Home() {
     from: undefined,
     to: undefined,
   });
+  const [lastDate, setLastDate] = React.useState<{
+    from: Date;
+    to: Date;
+  } | null>(null);
   const [cpf, setCPF] = React.useState<string>("");
 
   const handleChangeCPF = (evt: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,6 +87,8 @@ export default function Home() {
   const [registros, setRegistros] = React.useState<
     Record<string, FilteredRegistro> | undefined
   >(undefined);
+
+  const [user, setUser] = React.useState<UserWithSetor | undefined>(undefined);
 
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
@@ -120,7 +129,7 @@ export default function Home() {
         const data: RegistroAPIResponse = await res.json();
         setLoading(false);
 
-        const registros = data.registros;
+        const { registros, user } = data;
 
         const registrosTable = registros.reduce(
           (lista, registro) => {
@@ -136,11 +145,33 @@ export default function Home() {
           },
           {} as Record<string, any>,
         );
+        setLastDate({ from: date.from, to: date.to });
         setRegistros(registrosTable);
+        setUser(user);
       } catch (error) {
         console.log(error);
         setLoading(false);
       }
+    }
+  };
+
+  const handleExport = () => {
+    if (
+      registros &&
+      lastDate !== null &&
+      auth()?.user.nivel !== "Super-Admin"
+    ) {
+      exportPDF(registros, auth()?.user as UserWithSetor, lastDate);
+      return;
+    }
+
+    if (
+      registros &&
+      lastDate !== null &&
+      user &&
+      auth()?.user.nivel === "Super-Admin"
+    ) {
+      exportPDF(registros, user, lastDate);
     }
   };
 
@@ -219,6 +250,17 @@ export default function Home() {
           {loading ? "Carregando..." : "Consultar"}
         </button>
       </form>
+      {registros && lastDate && Object.keys(registros).length > 0 && (
+        <button
+          onClick={handleExport}
+          disabled={
+            !(registros && lastDate && Object.keys(registros).length > 0)
+          }
+          className="mx-auto rounded bg-slate-500/40 bg-gradient-to-r px-4 py-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white disabled:cursor-not-allowed disabled:bg-slate-500/10 disabled:from-indigo-500/10 disabled:to-rose-500/10 hover:disabled:text-white/80"
+        >
+          Exportar PDF
+        </button>
+      )}
       <div className="mx-4 flex-1 rounded border border-white/20 bg-slate-800 bg-gradient-to-br from-indigo-700/20 to-rose-500/20">
         <Table className="flex-1 shadow shadow-black/20">
           <TableHeader className="sticky top-0 bg-slate-700 bg-gradient-to-r from-indigo-700/50 to-rose-700/30">
