@@ -12,6 +12,7 @@ import { useAuthHeader } from "react-auth-kit";
 type AtribuirFaltaProps = {
   user: UserWithSetor;
   closePopup: () => void;
+  refetch: () => Promise<void>;
 };
 type Resultado = "unauthorized" | "not-found" | "ok";
 const notifications = {
@@ -35,7 +36,7 @@ const notifications = {
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function AlterarNivel({ closePopup, user }: AtribuirFaltaProps) {
+export default function AlterarNivel({ closePopup, user, refetch }: AtribuirFaltaProps) {
   const authHeader = useAuthHeader();
   const [nivel, setNivel] = React.useState<string>(user.nivel);
 
@@ -52,7 +53,7 @@ export default function AlterarNivel({ closePopup, user }: AtribuirFaltaProps) {
         const res = await fetch(`${API_URL}/api/nivel`, {
           method: "POST",
           body: JSON.stringify({
-            nivel: user.nivel,
+            nivel,
             user_id: user.id,
           }),
           headers: {
@@ -71,6 +72,7 @@ export default function AlterarNivel({ closePopup, user }: AtribuirFaltaProps) {
 
         setLoading(false);
         setNotification(notifications[data.resultado]);
+        await refetch();
         closePopup();
       } catch (error) {
         console.log(error);
@@ -111,6 +113,9 @@ export default function AlterarNivel({ closePopup, user }: AtribuirFaltaProps) {
             onSubmit={handleSubmit}
           >
             <select
+              className="rounded border-2 bg-white px-2 py-1 text-slate-800 shadow shadow-black/20 outline-0 focus:border-indigo-600/70 disabled:bg-slate-200/40"
+              disabled={loading}
+              required
               name="nivel"
               value={nivel}
               onChange={(evt) => setNivel(evt.target.value)}

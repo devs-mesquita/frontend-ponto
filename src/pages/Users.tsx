@@ -59,7 +59,7 @@ type AtribuirFaltaPopup = {
   | { isOpen: false; user: undefined }
 );
 type AlterarNivelPopup = {
-  close: () => void;
+  close: () => Promise<void>;
 } & (
   | { isOpen: true; user: UserWithSetor }
   | { isOpen: false; user: undefined }
@@ -224,7 +224,7 @@ export default function Configs() {
 
   const alterarNivelInitialState: AlterarNivelPopup = {
     isOpen: false,
-    close: () => {
+    close: async () => {
       setAlterarNivel((st) => ({ ...st, user: undefined, isOpen: false }));
     },
     user: undefined,
@@ -511,6 +511,7 @@ export default function Configs() {
         <AlterarNivel
           user={alterarNivel.user}
           closePopup={alterarNivel.close}
+          refetch={fetchUsersBySetor}
         />
       )}
     </>
