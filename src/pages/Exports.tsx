@@ -8,7 +8,7 @@ import * as React from "react";
 import { useAtom } from "jotai";
 import { notificationAtom } from "@/store";
 import { Navigate } from "react-router-dom";
-import { format, addHours } from "date-fns";
+import { format } from "date-fns";
 
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { DateRange } from "react-day-picker";
@@ -26,9 +26,6 @@ import {
 
 import TopNotification from "@/components/TopNotification";
 import InputMask from "react-input-mask";
-
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { UserWithSetor } from "@/types/interfaces";
 
 type Setor = {
@@ -54,18 +51,6 @@ type Registro = {
   data_hora: string;
 };
 
-type FilteredRegistro = {
-  entrada?: string;
-  "fim-intervalo"?: string;
-  "inicio-intervalo"?: string;
-  saida?: string;
-  falta?: string;
-  atestado?: string;
-  ferias?: string;
-  feriado?: string;
-  facultativo?: string;
-};
-
 type RegistroAPIResponse = {
   registros: Registro[];
   user: UserWithSetor;
@@ -78,7 +63,7 @@ export default function Exports() {
   const auth = useAuthUser();
   const authHeader = useAuthHeader();
 
-  const [notification, setNotification] = useAtom(notificationAtom);
+  const notification = useAtom(notificationAtom)[0];
   const [loading, setLoading] = React.useState<boolean>(false);
 
   const [date, setDate] = React.useState<DateRange | undefined>({
