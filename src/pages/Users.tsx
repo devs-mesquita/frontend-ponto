@@ -8,7 +8,7 @@ import errorFromApi from "@/utils/errorFromAPI";
 import { useAuthHeader, useAuthUser } from "react-auth-kit";
 import * as React from "react";
 import { useAtom } from "jotai";
-import { notificationAtom, notificationInitialState } from "@/store";
+import { notificationAtom /* notificationInitialState */ } from "@/store";
 import { Link, Navigate } from "react-router-dom";
 
 import type { UserWithSetor, Setor, AppDialog } from "@/types/interfaces";
@@ -31,7 +31,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-import { UserDataTable } from "@/components/UserDataTable/UserDataTable";
+import { UserDataTable } from "@/components/DataTables/UserDataTable";
 
 import TopNotification from "@/components/TopNotification";
 import { PlusIcon } from "lucide-react";
@@ -422,7 +422,7 @@ export default function Configs() {
         <h1 className="text-center text-slate-200/90">Lista de Usuários</h1>
         <div className="flex flex-col items-center justify-around gap-8 md:flex-row md:gap-4">
           <form
-            className="flex-2 flex flex-col items-center justify-center gap-2"
+            className="flex flex-1 flex-col items-center justify-center gap-2"
             onSubmit={handleConsulta}
           >
             <div className="flex items-center gap-4">
@@ -449,14 +449,26 @@ export default function Configs() {
               </button>
             </div>
           </form>
-          <Link
-            to="/register"
-            title="Registrar novo usuário."
-            className="flex items-center gap-2 rounded bg-green-500/80 px-2 py-1 text-base text-green-50 shadow shadow-black/20 hover:bg-green-600/80"
-          >
-            <PlusIcon className="h-5 w-5" />
-            Novo Usuário
-          </Link>
+          <div className="flex flex-1 justify-end px-8 gap-4">
+            <Link
+              to="/register"
+              title="Registrar novo usuário."
+              className="flex items-center gap-2 rounded bg-green-500/80 px-2 py-1 text-base text-green-50 shadow shadow-black/20 hover:bg-green-600/80"
+            >
+              <PlusIcon className="h-5 w-5" />
+              Novo Usuário
+            </Link>
+            {auth()?.user.nivel === "Super-Admin" && (
+              <Link
+                to="/setores/create"
+                title="Criar novo setor."
+                className="flex items-center gap-2 rounded bg-blue-500/80 px-2 py-1 text-base text-blue-50 shadow shadow-black/20 hover:bg-blue-600/80"
+              >
+                <PlusIcon className="h-5 w-5" />
+                Novo Setor
+              </Link>
+            )}
+          </div>
         </div>
         {message.message.length > 0 && (
           <h2

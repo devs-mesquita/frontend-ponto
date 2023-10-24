@@ -11,6 +11,7 @@ import Configs from "./pages/Configs";
 import NotFound from "./pages/NotFound";
 import Users from "./pages/Users";
 import Exports from "./pages/Exports";
+import SetorCreate from "./pages/SetorCreate";
 
 export default function App() {
   return (
@@ -71,6 +72,14 @@ export default function App() {
             element={
               <RequireAuth loginPath="/login">
                 <Register />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="setores/create"
+            element={
+              <RequireAuth loginPath="/login">
+                <SetorCreate />
               </RequireAuth>
             }
           />
