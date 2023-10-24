@@ -152,7 +152,7 @@ export default function Feriados() {
     evt: React.FormEvent<HTMLFormElement>,
   ) => {
     evt.preventDefault();
-    setNotification(notificationInitialState);
+    //setNotification(notificationInitialState);
     await fetchConsulta();
   };
 
@@ -163,7 +163,7 @@ export default function Feriados() {
     evt.preventDefault();
     if (dateNew && tipoNew) {
       setLoading(true);
-      setNotification(notificationInitialState);
+      //setNotification(notificationInitialState);
 
       try {
         const res = await fetch(`${API_URL}/api/registro`, {
@@ -243,7 +243,7 @@ export default function Feriados() {
   const handleDelete = async (dateKey: string) => {
     try {
       setLoading(true);
-      setNotification(notificationInitialState);
+      //setNotification(notificationInitialState);
 
       const res = await fetch(`${API_URL}/api/registro/delete`, {
         method: "POST",

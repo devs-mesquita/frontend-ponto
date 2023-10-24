@@ -47,7 +47,7 @@ export default function AlterarNivel({ closePopup, user, refetch }: AtribuirFalt
     evt.preventDefault();
     if (nivel) {
       setLoading(true);
-      setNotification(notificationInitialState);
+      //setNotification(notificationInitialState);
 
       try {
         const res = await fetch(`${API_URL}/api/nivel`, {
@@ -72,8 +72,8 @@ export default function AlterarNivel({ closePopup, user, refetch }: AtribuirFalt
 
         setLoading(false);
         setNotification(notifications[data.resultado]);
-        await refetch();
         closePopup();
+        await refetch();
       } catch (error) {
         console.log(error);
 

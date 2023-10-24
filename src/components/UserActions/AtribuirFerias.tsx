@@ -40,7 +40,7 @@ export default function AtribuirFerias({
     evt.preventDefault();
     if (date?.from && date.to) {
       setLoading(true);
-      setNotification(notificationInitialState);
+      //setNotification(notificationInitialState);
 
       const startDate = date.from;
       const endDate = date.to;

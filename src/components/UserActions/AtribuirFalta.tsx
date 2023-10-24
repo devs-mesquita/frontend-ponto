@@ -33,7 +33,7 @@ export default function AtribuirFalta({
     evt.preventDefault();
     if (date) {
       setLoading(true);
-      setNotification(notificationInitialState);
+      //setNotification(notificationInitialState);
 
       try {
         const res = await fetch(`${API_URL}/api/registro`, {

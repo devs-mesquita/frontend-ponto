@@ -145,7 +145,7 @@ export default function Configs() {
   const handleConsulta = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
     if (setorID) {
-      setNotification(notificationInitialState);
+      //setNotification(notificationInitialState);
       await fetchUsersBySetor();
     }
   };
@@ -263,7 +263,7 @@ export default function Configs() {
   const handleDelete = async (user_id: number) => {
     try {
       setLoading(true);
-      setNotification(notificationInitialState);
+      //setNotification(notificationInitialState);
 
       const res = await fetch(`${API_URL}/api/resetpassword`, {
         method: "POST",

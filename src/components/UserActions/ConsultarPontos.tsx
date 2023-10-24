@@ -148,7 +148,7 @@ export default function ConsultarPontos({
     evt: React.FormEvent<HTMLFormElement>,
   ) => {
     evt.preventDefault();
-    setNotification(notificationInitialState);
+    //setNotification(notificationInitialState);
     await fetchConsulta();
   };
 
@@ -179,7 +179,7 @@ export default function ConsultarPontos({
   const handleDelete = async (dateKey: string, tipo: string) => {
     try {
       setLoading(true);
-      setNotification(notificationInitialState);
+      //setNotification(notificationInitialState);
       console.log(dateKey);
 
       const res = await fetch(`${API_URL}/api/registro/delete`, {
