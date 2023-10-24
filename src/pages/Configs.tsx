@@ -88,9 +88,9 @@ export default function Register() {
       setMessage(results["wrong-confirm-password"]);
       return;
     }
-    
-    if(!form.confirmPassword || !form.currentPassword || !form.newPassword) {
-      return
+
+    if (!form.confirmPassword || !form.currentPassword || !form.newPassword) {
+      return;
     }
 
     setMessage(messageInit);
@@ -101,7 +101,7 @@ export default function Register() {
         body: JSON.stringify({
           currentPassword: form.currentPassword,
           newPassword: form.newPassword,
-          confirmPassword: form.confirmPassword
+          confirmPassword: form.confirmPassword,
         }),
         headers: {
           "Content-Type": "application/json",

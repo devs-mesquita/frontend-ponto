@@ -6,13 +6,15 @@ Tabela de Usuários:
 Ações:
   - Resetar Senha (confirmDialog).
 */
+import errorFromApi from "@/utils/errorFromAPI";
 import { useAuthHeader, useAuthUser } from "react-auth-kit";
 import * as React from "react";
 import { useAtom } from "jotai";
 import { notificationAtom, notificationInitialState } from "@/store";
 import { Link, Navigate } from "react-router-dom";
 
-import type { UserWithSetor, Setor } from "@/types/interfaces";
+import type { UserWithSetor, Setor, AppDialog } from "@/types/interfaces";
+import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 import ConsultarPontos from "@/components/UserActions/ConsultarPontos";
 import AtribuirFalta from "@/components/UserActions/AtribuirFalta";
@@ -22,6 +24,7 @@ import {
   MagnifyingGlassIcon,
   ExclamationTriangleIcon,
   StarFilledIcon,
+  SymbolIcon,
 } from "@radix-ui/react-icons";
 
 import {
@@ -58,6 +61,29 @@ type AtribuirFaltaPopup = {
   | { isOpen: true; user: UserWithSetor }
   | { isOpen: false; user: undefined }
 );
+type ResetPasswordResultado = "ok" | "unauthorized" | "not-found";
+type Message = {
+  type: "" | "success" | "error" | "warning";
+  message: string;
+};
+const results = {
+  ok: {
+    message: "Senha alterada com sucesso.",
+    type: "success",
+  },
+  unauthorized: {
+    message: "Permissão negada.",
+    type: "error",
+  },
+  "not-found": {
+    message: "Usuário não encontrado.",
+    type: "error",
+  },
+  error: {
+    message: "Ocorreu um erro.",
+    type: "error",
+  },
+} as const;
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -72,6 +98,12 @@ export default function Configs() {
   const [setores, setSetores] = React.useState<Setor[]>([]);
   const [setorID, setSetorID] = React.useState<string>("");
   const [users, setUsers] = React.useState<UserWithSetor[]>([]);
+
+  const messageInit: Message = {
+    message: "",
+    type: "",
+  };
+  const [message, setMessage] = React.useState<Message>(messageInit);
 
   const fetchUsersBySetor = async () => {
     if (setorID) {
@@ -184,6 +216,78 @@ export default function Configs() {
     setAtribuirFalta((st) => ({ ...st, user, isOpen: true }));
   };
 
+  const dialogInitialState: AppDialog = {
+    isOpen: false,
+    message: "",
+    accept: () => {},
+    reject: () => {},
+  };
+
+  const [dialog, setDialog] = React.useState<AppDialog>(dialogInitialState);
+
+  const handleConfirmation = (
+    accept: () => void,
+    message: string = "Deseja confimar a operação?",
+    reject = () => {
+      setDialog(() => dialogInitialState);
+    },
+  ) => {
+    setDialog({
+      isOpen: true,
+      accept,
+      reject,
+      message,
+    });
+  };
+
+  const handleDelete = async (user_id: number) => {
+    try {
+      setLoading(true);
+      setNotification(notificationInitialState);
+
+      const res = await fetch(`${API_URL}/api/resetpassword`, {
+        method: "POST",
+        body: JSON.stringify({
+          user_id,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: authHeader(),
+        },
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw err;
+      }
+
+      setLoading(false);
+      setDialog(dialogInitialState);
+      setNotification({
+        message: "Senha restaurada com sucesso.",
+        type: "success",
+      });
+      await fetchUsersBySetor();
+    } catch (error) {
+      /* console.error(error);
+      setLoading(false);
+      setNotification({
+        message: "Ocorreu um erro.",
+        type: "error",
+      }); */
+      if (error instanceof Error) {
+        setMessage(results["error"]);
+      } else if (
+        errorFromApi<{ resultado: ResetPasswordResultado }>(error, "resultado")
+      ) {
+        const resultado = error.resultado as ResetPasswordResultado;
+        setMessage(results[resultado]);
+      }
+      setLoading(false);
+    }
+  };
+
   return ["Admin", "Super-Admin"].includes(auth()?.user.nivel || "") ? (
     <>
       <div className="my-4 flex flex-1 flex-col gap-4 font-mono">
@@ -226,6 +330,21 @@ export default function Configs() {
             Novo Usuário
           </Link>
         </div>
+        {message.message.length > 0 && (
+          <h2
+            className={`mx-auto my-2 max-w-[275px] rounded px-2 py-1 text-center ${
+              message.type === "success"
+                ? "bg-green-400 text-green-900"
+                : message.type === "error"
+                ? "bg-red-400 text-red-900"
+                : message.type === "warning"
+                ? "bg-yellow-300 text-yellow-900"
+                : ""
+            }`}
+          >
+            {message.message}
+          </h2>
+        )}
         <div className="mx-4 flex-1 rounded border border-white/20 bg-slate-800 bg-gradient-to-br from-indigo-700/20 to-rose-500/20">
           <Table className="flex-1 shadow shadow-black/20">
             <TableHeader className="sticky top-0 bg-slate-700 bg-gradient-to-r from-indigo-700/50 to-rose-700/30">
@@ -265,6 +384,30 @@ export default function Configs() {
                       >
                         <StarFilledIcon className="h-5 w-5" />
                       </button>
+                      <form
+                        onSubmit={(evt) => {
+                          evt.preventDefault();
+                          handleConfirmation(
+                            () => handleDelete(user.id),
+                            `Deseja confirmar a restauração da senha de ${`${
+                              user.name.split(" ")[0]
+                            } ${
+                              user.name.split(" ")[1].length > 3
+                                ? user.name.split(" ")[1]
+                                : `${user.name.split(" ")[1]} ${
+                                    user.name.split(" ")[2]
+                                  }`
+                            }`}?`,
+                          );
+                        }}
+                      >
+                        <button
+                          title="Restaurar senha."
+                          className="rounded bg-blue-500/80 p-2 text-blue-50 shadow shadow-black/20 hover:bg-blue-600/80"
+                        >
+                          <SymbolIcon className="h-5 w-5" />
+                        </button>
+                      </form>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -273,6 +416,13 @@ export default function Configs() {
           </Table>
         </div>
       </div>
+      {dialog.isOpen && (
+        <ConfirmationDialog
+          accept={dialog.accept}
+          reject={dialog.reject}
+          message={dialog.message}
+        />
+      )}
       {notification.message && <TopNotification />}
       {consultarPontos.isOpen && (
         <ConsultarPontos
