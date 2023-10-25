@@ -72,7 +72,7 @@ export default function AtribuirFerias({
 
         setLoading(false);
         setNotification({
-          message: "Registros criados com sucesso.",
+          message: "Registros de férias criados com sucesso.",
           type: "success",
         });
         closePopup();

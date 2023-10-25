@@ -73,7 +73,7 @@ export default function AtribuirFalta({
           const resultado = error.resultado as Resultado;
           if (resultado === "existente") {
             setNotification({
-              message: "Um registro de falta já existe na data selecionada.",
+              message: "Registro existente na data selecionada.",
               type: "error",
             });
           }
