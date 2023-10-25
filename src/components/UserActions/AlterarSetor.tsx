@@ -1,6 +1,6 @@
 import * as React from "react";
 import ReactDOM from "react-dom";
-import type { UserWithSetor } from "@/types/interfaces";
+import type { UserWithSetor, Setor } from "@/types/interfaces";
 
 import errorFromApi from "@/utils/errorFromAPI";
 
@@ -29,31 +29,37 @@ const notifications = {
     type: "error",
   },
   ok: {
-    message: "Nível atribuído com sucesso.",
+    message: "Setor atribuído com sucesso.",
     type: "success",
   },
 } as const;
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function AlterarNivel({ closePopup, user, refetch }: AtribuirFaltaProps) {
+export default function AlterarSetor({
+  closePopup,
+  user,
+  refetch,
+}: AtribuirFaltaProps) {
   const authHeader = useAuthHeader();
-  const [nivel, setNivel] = React.useState<string>(user.nivel);
+  const [setorID, setSetorID] = React.useState<number>(user.setor_id);
 
   const setNotification = useAtom(notificationAtom)[1];
   const [loading, setLoading] = React.useState<boolean>(false);
 
+  const [setores, setSetores] = React.useState<Setor[]>([]);
+
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
-    if (nivel) {
+    if (setorID) {
       setLoading(true);
       //setNotification(notificationInitialState);
 
       try {
-        const res = await fetch(`${API_URL}/api/user/nivel`, {
+        const res = await fetch(`${API_URL}/api/user/setor`, {
           method: "POST",
           body: JSON.stringify({
-            nivel,
+            setor_id: setorID,
             user_id: user.id,
           }),
           headers: {
@@ -96,6 +102,33 @@ export default function AlterarNivel({ closePopup, user, refetch }: AtribuirFalt
     }
   };
 
+  React.useEffect(() => {
+    const getSetores = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/setores`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: authHeader(),
+          },
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw err;
+        }
+
+        const data: { setores: Setor[] } = await res.json();
+        setSetores(data.setores);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    getSetores();
+  }, []);
+
   const names = user.name.split(" ");
   const briefUserName = `${names[0]} ${
     names[1].length > 3 ? names[1] : `${names[1]} ${names[2]}`
@@ -108,31 +141,36 @@ export default function AlterarNivel({ closePopup, user, refetch }: AtribuirFalt
           <h2 className="text-center text-slate-200/90">
             Alterar nível de {briefUserName}
           </h2>
-          <form
-            className="flex-2 flex flex-col items-center justify-center gap-2"
-            onSubmit={handleSubmit}
-          >
-            <select
-              className="rounded border-2 bg-white px-2 py-1 text-slate-800 shadow shadow-black/20 outline-0 focus:border-indigo-600/70 disabled:bg-slate-200/40"
-              disabled={loading}
-              required
-              name="nivel"
-              value={nivel}
-              onChange={(evt) => setNivel(evt.target.value)}
+          {setores.length > 0 ? (
+            <form
+              className="flex-2 flex flex-col items-center justify-center gap-2"
+              onSubmit={handleSubmit}
             >
-              <option value="User">Usuário</option>
-              <option value="Admin">Administrador</option>
-              <option value="Super-Admin">Super Administrador</option>
-            </select>
-            <div className="flex items-center gap-4">
-              <button
+              <select
+                className="rounded border-2 bg-white px-2 py-1 text-slate-800 shadow shadow-black/20 outline-0 focus:border-indigo-600/70 disabled:bg-slate-200/40"
                 disabled={loading}
-                className="rounded bg-slate-500/40 bg-gradient-to-r px-4 py-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white disabled:bg-slate-500/10"
+                required
+                name="setor_id"
+                value={setorID}
+                onChange={(evt) => setSetorID(+evt.target.value)}
               >
-                {loading ? "Carregando..." : "Atribuir"}
-              </button>
-            </div>
-          </form>
+                {setores.map((setor) => (
+                  <option key={crypto.randomUUID()} value={setor.id}>
+                    {setor.nome}
+                  </option>
+                ))}
+              </select>
+
+              <div className="flex items-center gap-4">
+                <button
+                  disabled={loading}
+                  className="rounded bg-slate-500/40 bg-gradient-to-r px-4 py-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white disabled:bg-slate-500/10"
+                >
+                  {loading ? "Carregando..." : "Atribuir"}
+                </button>
+              </div>
+            </form>
+          ) : <span className="text-center text-white">Carregando setores...</span>}
         </div>
       </div>
       <div

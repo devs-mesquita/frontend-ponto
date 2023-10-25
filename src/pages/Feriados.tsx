@@ -13,7 +13,7 @@ import { ptBR } from "date-fns/locale";
 import { Navigate } from "react-router-dom";
 
 import { useAtom } from "jotai";
-import { notificationAtom, notificationInitialState } from "@/store";
+import { notificationAtom } from "@/store";
 
 import errorFromApi from "@/utils/errorFromAPI";
 

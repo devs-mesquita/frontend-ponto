@@ -5,7 +5,7 @@ import type { UserWithSetor } from "@/types/interfaces";
 import errorFromApi from "@/utils/errorFromAPI";
 import { ptBR } from "date-fns/locale";
 
-import { notificationAtom, notificationInitialState } from "@/store";
+import { notificationAtom } from "@/store";
 import { useAtom } from "jotai";
 
 import { Calendar } from "@/components/ui/calendar";

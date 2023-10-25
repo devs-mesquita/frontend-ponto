@@ -18,6 +18,7 @@ import ConsultarPontos from "@/components/UserActions/ConsultarPontos";
 import AtribuirFalta from "@/components/UserActions/AtribuirFalta";
 import AtribuirFerias from "@/components/UserActions/AtribuirFerias";
 import AlterarNivel from "@/components/UserActions/AlterarNivel";
+import AlterarSetor from "@/components/UserActions/AlterarSetor";
 
 import {
   MagnifyingGlassIcon,
@@ -25,6 +26,7 @@ import {
   StarFilledIcon,
   SymbolIcon,
   AvatarIcon,
+  IdCardIcon,
 } from "@radix-ui/react-icons";
 
 import { ColumnDef } from "@tanstack/react-table";
@@ -59,6 +61,12 @@ type AtribuirFaltaPopup = {
   | { isOpen: false; user: undefined }
 );
 type AlterarNivelPopup = {
+  close: () => Promise<void>;
+} & (
+  | { isOpen: true; user: UserWithSetor }
+  | { isOpen: false; user: undefined }
+);
+type AlterarSetorPopup = {
   close: () => Promise<void>;
 } & (
   | { isOpen: true; user: UserWithSetor }
@@ -236,6 +244,20 @@ export default function Configs() {
     setAlterarNivel((st) => ({ ...st, user, isOpen: true }));
   };
 
+  const alterarSetorInitialState: AlterarSetorPopup = {
+    isOpen: false,
+    close: async () => {
+      setAlterarSetor((st) => ({ ...st, user: undefined, isOpen: false }));
+    },
+    user: undefined,
+  };
+  const [alterarSetor, setAlterarSetor] = React.useState<AlterarSetorPopup>(
+    alterarSetorInitialState,
+  );
+  const handlePopupAlterarSetor = (user: UserWithSetor) => {
+    setAlterarSetor((st) => ({ ...st, user, isOpen: true }));
+  };
+
   const dialogInitialState: AppDialog = {
     isOpen: false,
     message: "",
@@ -402,13 +424,22 @@ export default function Configs() {
               </button>
             </form>
             {auth()?.user.nivel === "Super-Admin" && (
-              <button
-                title="Alterar nível."
-                className="rounded bg-yellow-500/80 p-2 text-yellow-50 shadow shadow-black/20 hover:bg-yellow-600/80"
-                onClick={() => handlePopupAlterarNivel(user)}
-              >
-                <AvatarIcon className="h-5 w-5" />
-              </button>
+              <>
+                <button
+                  title="Alterar setor."
+                  className="rounded bg-yellow-500/80 p-2 text-yellow-50 shadow shadow-black/20 hover:bg-yellow-600/80"
+                  onClick={() => handlePopupAlterarSetor(user)}
+                >
+                  <IdCardIcon className="h-5 w-5" />
+                </button>
+                <button
+                  title="Alterar nível."
+                  className="rounded bg-purple-500/80 p-2 text-purple-50 shadow shadow-black/20 hover:bg-purple-600/80"
+                  onClick={() => handlePopupAlterarNivel(user)}
+                >
+                  <AvatarIcon className="h-5 w-5" />
+                </button>
+              </>
             )}
           </div>
         );
@@ -449,7 +480,7 @@ export default function Configs() {
               </button>
             </div>
           </form>
-          <div className="flex flex-1 justify-end px-8 gap-4">
+          <div className="flex flex-1 justify-end gap-4 px-8">
             <Link
               to="/register"
               title="Registrar novo usuário."
@@ -523,6 +554,13 @@ export default function Configs() {
         <AlterarNivel
           user={alterarNivel.user}
           closePopup={alterarNivel.close}
+          refetch={fetchUsersBySetor}
+        />
+      )}
+      {alterarSetor.isOpen && (
+        <AlterarSetor
+          user={alterarSetor.user}
+          closePopup={alterarSetor.close}
           refetch={fetchUsersBySetor}
         />
       )}
