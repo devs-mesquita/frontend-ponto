@@ -459,13 +459,13 @@ export default function Configs() {
             <div className="flex items-center gap-4">
               <h2 className="text-center text-slate-200/90">Setor:</h2>
               <select
-                className="rounded border-2 bg-white px-2 py-1 text-slate-800 shadow shadow-black/20 outline-0 focus:border-indigo-600/70 disabled:bg-slate-200/40"
-                disabled={loading}
+                className="rounded border-2 bg-white px-2 py-1 text-slate-800 shadow shadow-black/20 outline-0 focus:border-indigo-600/70 disabled:bg-slate-200/40 hover:disabled:cursor-wait"
+                disabled={loading || setores.length === 0}
                 required
                 value={setorID}
                 onChange={(evt) => setSetorID(evt.target.value)}
               >
-                <option value="">Selecione o setor</option>
+                <option value="">{ setores.length === 0 ? "Carregando opções..." : "Selecione o setor"}</option>
                 {setores.map((setor) => (
                   <option value={setor.id} key={crypto.randomUUID()}>
                     {setor.nome}
@@ -473,8 +473,8 @@ export default function Configs() {
                 ))}
               </select>
               <button
-                disabled={loading}
-                className="rounded bg-slate-500/40 bg-gradient-to-r px-4 py-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white disabled:bg-slate-500/10"
+                disabled={loading || setores.length === 0}
+                className="rounded bg-slate-500/40 bg-gradient-to-r px-4 py-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white disabled:bg-slate-500/10 hover:disabled:cursor-wait hover:disabled:text-white/80"
               >
                 {loading ? "Carregando..." : "Consultar"}
               </button>
