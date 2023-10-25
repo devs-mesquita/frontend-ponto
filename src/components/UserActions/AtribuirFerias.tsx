@@ -6,12 +6,12 @@ import errorFromApi from "@/utils/errorFromAPI";
 import { DateRange } from "react-day-picker";
 import { ptBR } from "date-fns/locale";
 
-import { notificationAtom, notificationInitialState } from "@/store";
+import { notificationAtom } from "@/store";
 import { useAtom } from "jotai";
 
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
-import { differenceInDays, addDays } from "date-fns";
+import { differenceInDays, addDays, format } from "date-fns";
 import { useAuthHeader } from "react-auth-kit";
 
 type AtribuirFeriasProps = {
@@ -27,7 +27,7 @@ export default function AtribuirFerias({
   user,
 }: AtribuirFeriasProps) {
   const authHeader = useAuthHeader();
-  
+
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: undefined,
     to: undefined,
@@ -39,14 +39,16 @@ export default function AtribuirFerias({
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
     if (date?.from && date.to) {
-      setLoading(true);
+      //setLoading(true);
       //setNotification(notificationInitialState);
 
       const startDate = date.from;
       const endDate = date.to;
       const daysQuantity = differenceInDays(endDate, startDate) + 1;
       const dates = Array.from({ length: daysQuantity }, (_value, index) => {
-        return addDays(startDate, index).toDateString();
+        return format(addDays(startDate, index), "yyyy-MM-dd 00:00:00", {
+          locale: ptBR,
+        });
       });
 
       try {
@@ -59,7 +61,7 @@ export default function AtribuirFerias({
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
-            Authorization: authHeader()
+            Authorization: authHeader(),
           },
         });
 

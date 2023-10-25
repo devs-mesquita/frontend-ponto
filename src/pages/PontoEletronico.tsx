@@ -142,7 +142,6 @@ export default function PontoEletronico() {
         method: "POST",
         body: formData,
         headers: {
-          "Content-Type": "application/json",
           Accept: "application/json",
           Authorization: authHeader(),
           "X-API-KEY": API_KEY,
