@@ -27,6 +27,7 @@ import {
 import TopNotification from "@/components/TopNotification";
 import InputMask from "react-input-mask";
 import { UserWithSetor } from "@/types/interfaces";
+import exportSetorPDF from "@/utils/exportSetorPDF";
 
 type Setor = {
   id: number;
@@ -54,6 +55,28 @@ type Registro = {
 type RegistroAPIResponse = {
   registros: Registro[];
   user: UserWithSetor;
+};
+
+/* type FilteredRegistro = {
+  entrada?: string;
+  "fim-intervalo"?: string;
+  "inicio-intervalo"?: string;
+  saida?: string;
+  falta?: string;
+  atestado?: string;
+  ferias?: string;
+  feriado?: string;
+  facultativo?: string;
+}; */
+
+/* type UserWithSetorWithRegistros = UserWithSetor & {
+  registros: Omit<FilteredRegistro, "feriado" | "facultativo">[];
+}; */
+
+type SetorRegistrosAPIResponse = {
+  users: UserWithSetor[];
+  feriados: Registro[];
+  setorRegistros: Registro[];
 };
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -170,10 +193,50 @@ export default function Exports() {
     }
   };
 
-  const handleSubmitExportSetorPontos = (
+  const handleSubmitExportSetorPontos = async (
     evt: React.FormEvent<HTMLFormElement>,
   ) => {
     evt.preventDefault();
+    if (date?.from && date?.to && setorID) {
+      setLoading(true);
+      try {
+        const res = await fetch(
+          `${API_URL}/api/registro/setor?` +
+            new URLSearchParams({
+              from: date.from.toDateString(),
+              to: date.to.toDateString(),
+              setor_id: setorID,
+            }),
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Authorization: authHeader(),
+            },
+          },
+        );
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw err;
+        }
+
+        const data: SetorRegistrosAPIResponse = await res.json();
+        setLoading(false);
+
+        const { users, feriados, setorRegistros } = data;
+        console.log(users, feriados, setorRegistros);
+
+        exportSetorPDF(users, feriados, setorRegistros, {
+          from: date.from,
+          to: date.to,
+        });
+        
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
+    }
   };
 
   return ["Admin", "Super-Admin"].includes(auth()?.user.nivel || "") ? (
@@ -258,7 +321,7 @@ export default function Exports() {
           </form>
           <form
             className="flex flex-col items-center justify-center gap-4"
-            onSubmit={handleSubmitExportUserPontos}
+            onSubmit={handleSubmitExportSetorPontos}
           >
             <h1 className="text-center text-slate-200/90">Pontos por Setor</h1>
             <div className="flex items-center justify-center gap-3">

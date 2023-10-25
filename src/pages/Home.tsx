@@ -303,7 +303,13 @@ export default function Home() {
                         </>
                       ) : (
                         <>
-                          {registros[dateKey]?.facultativo ? (
+                          {registros[dateKey]?.facultativo &&
+                          !(
+                            registros[dateKey]?.entrada ||
+                            registros[dateKey]?.saida ||
+                            registros[dateKey]?.["fim-intervalo"] ||
+                            registros[dateKey]?.["inicio-intervalo"]
+                          ) ? (
                             <>
                               <TableCell>FACULTATIVO</TableCell>
                               <TableCell>FACULTATIVO</TableCell>

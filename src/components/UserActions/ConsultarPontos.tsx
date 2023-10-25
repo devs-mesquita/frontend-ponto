@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/popover";
 
 import { useAtom } from "jotai";
-import { notificationAtom, notificationInitialState } from "@/store";
+import { notificationAtom } from "@/store";
 import { AppDialog } from "@/types/interfaces";
 import ConfirmationDialog from "../ConfirmationDialog";
 
@@ -361,7 +361,13 @@ export default function ConsultarPontos({
                             </>
                           ) : (
                             <>
-                              {registros[dateKey]?.facultativo ? (
+                              {registros[dateKey]?.facultativo &&
+                              !(
+                                registros[dateKey]?.entrada ||
+                                registros[dateKey]?.saida ||
+                                registros[dateKey]?.["fim-intervalo"] ||
+                                registros[dateKey]?.["inicio-intervalo"]
+                              ) ? (
                                 <>
                                   <TableCell>FACULTATIVO</TableCell>
                                   <TableCell>FACULTATIVO</TableCell>

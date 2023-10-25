@@ -20,9 +20,14 @@ export default function (
   )}.${user.cpf.slice(6, 9)}-${user.cpf.slice(9)}`;
 
   doc.setFontSize(16);
-  doc.text(`Planilha de Horário de ${fromDate} a ${toDate}`, doc.internal.pageSize.width/2, 15, {
-    align: "center",
-  });
+  doc.text(
+    `Planilha de Horário de ${fromDate} a ${toDate}`,
+    doc.internal.pageSize.width / 2,
+    15,
+    {
+      align: "center",
+    },
+  );
   doc.setFontSize(12);
   doc.text(`Nome: ${user.name}`, 15, 25, {});
   doc.text(`Setor: ${user.setor.nome}`, 15, 32);
@@ -53,7 +58,15 @@ export default function (
       if (registrosTable[dateKey]?.feriado) {
         return [pontoDate, "FERIADO", "FERIADO", "FERIADO", "FERIADO"];
       }
-      if (registrosTable[dateKey]?.facultativo) {
+      if (
+        registrosTable[dateKey]?.facultativo &&
+        !(
+          registrosTable[dateKey]?.entrada ||
+          registrosTable[dateKey]?.saida ||
+          registrosTable[dateKey]?.["fim-intervalo"] ||
+          registrosTable[dateKey]?.["inicio-intervalo"]
+        )
+      ) {
         return [
           pontoDate,
           "FACULTATIVO",
