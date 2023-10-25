@@ -13,7 +13,7 @@ export default function Navbar() {
   return (
     <header className="flex items-center gap-8 border-b border-white/20 px-4 shadow shadow-black/20 md:px-8 md:py-4">
       <NavLink
-        to={auth()?.user.setor.nome === "PONTO" ? "/ponto" : "/"}
+        to={auth()?.user.setor.nome === "TERMINAL" ? "/terminal" : "/"}
         className={({ isActive }) =>
           `${
             isActive ? "text-white" : "text-white/60 hover:text-white/80"

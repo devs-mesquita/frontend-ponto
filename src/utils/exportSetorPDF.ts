@@ -116,7 +116,15 @@ export default function (
         if (user.registrosTable[dateKey]?.ferias) {
           return [pontoDate, "FÉRIAS", "FÉRIAS", "FÉRIAS", "FÉRIAS"];
         }
-        if (feriadosTable[dateKey]?.feriado) {
+        if (
+          feriadosTable[dateKey]?.feriado &&
+          !(
+            user.registrosTable[dateKey]?.entrada ||
+            user.registrosTable[dateKey]?.saida ||
+            user.registrosTable[dateKey]?.["fim-intervalo"] ||
+            user.registrosTable[dateKey]?.["inicio-intervalo"]
+          )
+        ) {
           return [pontoDate, "FERIADO", "FERIADO", "FERIADO", "FERIADO"];
         }
         if (

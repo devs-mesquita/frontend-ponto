@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { RequireAuth } from "react-auth-kit";
 
 import Layout from "./components/Layout";
-import PontoEletronico from "./pages/PontoEletronico";
+import Terminal from "./pages/Terminal";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
@@ -18,10 +18,10 @@ export default function App() {
     <div className="flex min-h-screen flex-col bg-slate-800 bg-gradient-to-br from-indigo-700/20 to-rose-600/20">
       <Routes>
         <Route
-          path="ponto"
+          path="terminal"
           element={
             <RequireAuth loginPath="/login">
-              <PontoEletronico />
+              <Terminal />
             </RequireAuth>
           }
         />

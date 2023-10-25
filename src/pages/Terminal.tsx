@@ -66,7 +66,7 @@ const messages = {
   saida: "Horário de saída registrado com sucesso.",
 } as const;
 
-export default function PontoEletronico() {
+export default function Terminal() {
   document.title = "Ponto Eletrônico";
 
   const auth = useAuthUser();
@@ -185,7 +185,7 @@ export default function PontoEletronico() {
     }, 5000);
   };
 
-  return auth()?.user.setor.nome === "PONTO" ? (
+  return auth()?.user.setor.nome === "TERMINAL" ? (
     <div className="m-auto my-4 flex flex-1 flex-col justify-center gap-6">
       <div className="rounded-lg bg-white/5 p-2 shadow-md shadow-black/20">
         <div className="h-[300px] w-[300px] overflow-hidden">

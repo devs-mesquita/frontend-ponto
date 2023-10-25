@@ -57,22 +57,6 @@ type RegistroAPIResponse = {
   user: UserWithSetor;
 };
 
-/* type FilteredRegistro = {
-  entrada?: string;
-  "fim-intervalo"?: string;
-  "inicio-intervalo"?: string;
-  saida?: string;
-  falta?: string;
-  atestado?: string;
-  ferias?: string;
-  feriado?: string;
-  facultativo?: string;
-}; */
-
-/* type UserWithSetorWithRegistros = UserWithSetor & {
-  registros: Omit<FilteredRegistro, "feriado" | "facultativo">[];
-}; */
-
 type SetorRegistrosAPIResponse = {
   users: UserWithSetor[];
   feriados: Registro[];

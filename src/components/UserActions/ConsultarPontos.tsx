@@ -351,7 +351,13 @@ export default function ConsultarPontos({
                         </>
                       ) : (
                         <>
-                          {registros[dateKey]?.feriado ? (
+                          {registros[dateKey]?.feriado &&
+                          !(
+                            registros[dateKey]?.entrada ||
+                            registros[dateKey]?.saida ||
+                            registros[dateKey]?.["fim-intervalo"] ||
+                            registros[dateKey]?.["inicio-intervalo"]
+                          ) ? (
                             <>
                               <TableCell>FERIADO</TableCell>
                               <TableCell>FERIADO</TableCell>

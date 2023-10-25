@@ -55,7 +55,15 @@ export default function (
       if (registrosTable[dateKey]?.ferias) {
         return [pontoDate, "FÉRIAS", "FÉRIAS", "FÉRIAS", "FÉRIAS"];
       }
-      if (registrosTable[dateKey]?.feriado) {
+      if (
+        registrosTable[dateKey]?.feriado &&
+        !(
+          registrosTable[dateKey]?.entrada ||
+          registrosTable[dateKey]?.saida ||
+          registrosTable[dateKey]?.["fim-intervalo"] ||
+          registrosTable[dateKey]?.["inicio-intervalo"]
+        )
+      ) {
         return [pontoDate, "FERIADO", "FERIADO", "FERIADO", "FERIADO"];
       }
       if (
