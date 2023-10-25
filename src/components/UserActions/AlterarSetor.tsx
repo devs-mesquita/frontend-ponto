@@ -170,7 +170,11 @@ export default function AlterarSetor({
                 </button>
               </div>
             </form>
-          ) : <span className="text-center text-white">Carregando setores...</span>}
+          ) : (
+            <span className="text-center text-white">
+              Carregando setores...
+            </span>
+          )}
         </div>
       </div>
       <div
