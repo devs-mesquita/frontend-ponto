@@ -1,11 +1,24 @@
 import { useState } from "react";
 import { useSignIn, useIsAuthenticated } from "react-auth-kit";
 import { useNavigate, Navigate } from "react-router-dom";
+import errorFromApi from "@/utils/errorFromAPI";
 
 type Message = {
   type: "" | "success" | "error" | "warning";
   message: string;
 };
+
+type Resultado = "unauthorized";
+const messages = {
+  unauthorized: {
+    message: "Credenciais inválidas.",
+    type: "error",
+  },
+  error: {
+    message: "Ocorreu um erro.",
+    type: "error",
+  },
+} as const;
 
 type LoginAPIResponse = {
   authorization: {
@@ -89,17 +102,10 @@ export default function Login() {
     } catch (error) {
       console.error(error);
       if (error instanceof Error) {
-        if (error.message === "Unauthorized") {
-          setMessage({
-            message: "Credenciais inválidas.",
-            type: "error",
-          });
-        } else {
-          setMessage({
-            message: "Ocorreu um erro.",
-            type: "error",
-          });
-        }
+        setMessage(messages["error"]);
+      } else if (errorFromApi<{ resultado: Resultado }>(error, "resultado")) {
+        const resultado = error.resultado as Resultado;
+        setMessage(messages[resultado]);
       }
       setLoading(false);
     }

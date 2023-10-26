@@ -42,7 +42,8 @@ type ConfirmarRegistroResultado =
   | "invalid-cpf"
   | "ferias"
   | "falta"
-  | "atestado";
+  | "atestado"
+  | "unauthorized"
 
 type ConfirmarRegistroAPIResponse =
   | {
@@ -88,6 +89,10 @@ const results = {
   atestado: {
     type: "warning",
     message: "Registro de atestado existente nesta data.",
+  },
+  unauthorized: {
+    type: "warning",
+    message: "Permissão negada.",
   },
 } as const;
 
