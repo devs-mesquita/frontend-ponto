@@ -21,8 +21,20 @@ type Registro = {
   data_hora: string;
 };
 
+type FilteredRegistro = {
+  entrada?: string;
+  "fim-intervalo"?: string;
+  "inicio-intervalo"?: string;
+  saida?: string;
+  falta?: string;
+  atestado?: string;
+  ferias?: string;
+  feriado?: string;
+  facultativo?: string;
+};
+
 type UserWithRegistros = UserWithSetor & {
-  registrosTable: Record<string, any>;
+  registrosTable: Record<string, FilteredRegistro>;
 };
 
 const parseRegistrosToTable = (registros: Registro[]) => {
@@ -38,7 +50,7 @@ const parseRegistrosToTable = (registros: Registro[]) => {
         },
       };
     },
-    {} as Record<string, any>,
+    {} as Record<string, FilteredRegistro>,
   );
 
   return registrosTable;
@@ -70,7 +82,7 @@ export default function (
   const feriadosTable = parseRegistrosToTable(feriados);
 
   let i = 0;
-  for (let user of usersWithRegistros) {
+  for (const user of usersWithRegistros) {
     const cpfWithSymbols = `${user.cpf.slice(0, 3)}.${user.cpf.slice(
       3,
       6,

@@ -153,7 +153,6 @@ export default function Configs() {
   const handleConsulta = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
     if (setorID) {
-      //setNotification(notificationInitialState);
       await fetchUsersBySetor();
     }
   };
@@ -285,8 +284,6 @@ export default function Configs() {
   const handleDelete = async (user_id: number) => {
     try {
       setLoading(true);
-      //setNotification(notificationInitialState);
-
       const res = await fetch(`${API_URL}/api/resetpassword`, {
         method: "POST",
         body: JSON.stringify({
@@ -465,7 +462,11 @@ export default function Configs() {
                 value={setorID}
                 onChange={(evt) => setSetorID(evt.target.value)}
               >
-                <option value="">{ setores.length === 0 ? "Carregando opções..." : "Selecione o setor"}</option>
+                <option value="">
+                  {setores.length === 0
+                    ? "Carregando opções..."
+                    : "Selecione o setor"}
+                </option>
                 {setores.map((setor) => (
                   <option value={setor.id} key={crypto.randomUUID()}>
                     {setor.nome}

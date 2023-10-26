@@ -7,7 +7,7 @@ export interface AppDialog {
 
 export type AppNotification = {
   message: string;
-  type: "error" | "success" | "";
+  type: "error" | "success" | "warning" | "";
 };
 
 export type Setor = {

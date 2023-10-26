@@ -5,8 +5,8 @@ import { notificationAtom } from "@/store";
 
 interface ConfirmationDialogProps {
   message: string;
-  accept: () => any;
-  reject: () => any;
+  accept: () => void;
+  reject: () => void;
 }
 
 export default function ConfirmationDialog({
@@ -22,7 +22,6 @@ export default function ConfirmationDialog({
       setIsLoading(true);
       await accept();
       setIsLoading(false);
-      
     } catch (error) {
       console.error(error);
       setIsLoading(false);

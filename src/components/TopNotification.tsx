@@ -14,7 +14,11 @@ export default function TopNotification() {
       className={`z-20 flex w-full items-center px-4 py-2 text-center font-medium ${
         notification.type === "error"
           ? "bg-red-300 text-red-900"
-          : "bg-green-300 text-green-800"
+          : notification.type === "success"
+          ? "bg-green-300 text-green-800"
+          : notification.type === "warning"
+          ? "bg-yellow-300 text-yellow-900"
+          : ""
       }`}
     >
       <p className="mx-auto">{notification.message}</p>

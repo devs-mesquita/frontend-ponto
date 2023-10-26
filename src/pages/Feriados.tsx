@@ -134,7 +134,7 @@ export default function Feriados() {
               },
             };
           },
-          {} as Record<string, any>,
+          {} as Record<string, FilteredRegistro>,
         );
         setRegistros(registrosTable);
       } catch (error) {

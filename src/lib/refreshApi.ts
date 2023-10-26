@@ -1,4 +1,4 @@
-import { useAuthHeader, createRefresh } from "react-auth-kit";
+import { createRefresh } from "react-auth-kit";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -17,15 +17,17 @@ type RefreshAPIResponse = {
 
 const refreshApi = createRefresh({
   interval: 10, // Refreshs the token in every 10 minutes
-  refreshApiCallback: async () => {
-    const authHeader = useAuthHeader();
+  refreshApiCallback: async ({ authToken, refreshToken }) => {
     try {
       const res = await fetch(`${API_URL}/api/login`, {
         method: "POST",
+        body: JSON.stringify({
+          refresh: refreshToken,
+        }),
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          Authorization: authHeader(),
+          Authorization: `Bearer ${authToken}`,
         },
       });
 
@@ -48,7 +50,7 @@ const refreshApi = createRefresh({
       console.error(error);
       return {
         isSuccess: false,
-        newAuthToken: authHeader(),
+        newAuthToken: authToken || "",
       };
     }
   },

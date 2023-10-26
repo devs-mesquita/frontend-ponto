@@ -130,7 +130,7 @@ export default function ConsultarPontos({
               },
             };
           },
-          {} as Record<string, any>,
+          {} as Record<string, FilteredRegistro>,
         );
         setRegistros(registrosTable);
       } catch (error) {

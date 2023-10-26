@@ -5,8 +5,20 @@ import ptBR from "date-fns/locale/pt-BR";
 
 import { UserWithSetor } from "@/types/interfaces";
 
+type FilteredRegistro = {
+  entrada?: string;
+  "fim-intervalo"?: string;
+  "inicio-intervalo"?: string;
+  saida?: string;
+  falta?: string;
+  atestado?: string;
+  ferias?: string;
+  feriado?: string;
+  facultativo?: string;
+};
+
 export default function (
-  registrosTable: Record<string, any>,
+  registrosTable: Record<string, FilteredRegistro>,
   user: UserWithSetor,
   date: { from: Date; to: Date },
 ) {

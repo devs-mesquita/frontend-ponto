@@ -52,6 +52,18 @@ type Registro = {
   data_hora: string;
 };
 
+type FilteredRegistro = {
+  entrada?: string;
+  "fim-intervalo"?: string;
+  "inicio-intervalo"?: string;
+  saida?: string;
+  falta?: string;
+  atestado?: string;
+  ferias?: string;
+  feriado?: string;
+  facultativo?: string;
+};
+
 type RegistroAPIResponse = {
   registros: Registro[];
   user: UserWithSetor;
@@ -164,7 +176,7 @@ export default function Exports() {
               },
             };
           },
-          {} as Record<string, any>,
+          {} as Record<string, FilteredRegistro>,
         );
 
         if (date.to && date.from) {

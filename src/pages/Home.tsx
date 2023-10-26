@@ -143,7 +143,7 @@ export default function Home() {
               },
             };
           },
-          {} as Record<string, any>,
+          {} as Record<string, FilteredRegistro>,
         );
         setLastDate({ from: date.from, to: date.to });
         setRegistros(registrosTable);
