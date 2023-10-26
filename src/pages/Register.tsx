@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuthUser, useAuthHeader } from "react-auth-kit";
 import InputMask from "react-input-mask";
 import { Navigate } from "react-router-dom";
+import errorFromApi from "@/utils/errorFromAPI";
 
 type Setor = {
   id: number;
@@ -26,6 +27,18 @@ const results = {
   created: {
     message: "Usuário registrado com sucesso.",
     type: "success",
+  },
+  "cpf-existente": {
+    message: "O CPF informado já está cadastrado.",
+    type: "error",
+  },
+  "email-existente": {
+    message: "O E-mail informado já está cadastrado.",
+    type: "error",
+  },
+  error: {
+    message: "Ocorreu um erro.",
+    type: "error",
   },
 } as const;
 
@@ -91,10 +104,15 @@ export default function Register() {
       setForm(formInit);
       setLoading(false);
     } catch (error) {
-      setMessage({
-        message: "Ocorreu um erro.",
-        type: "error",
-      });
+      console.error(error);
+      if (error instanceof Error) {
+        setMessage(results["error"]);
+      } else if (
+        errorFromApi<{ resultado: RegisterResultado }>(error, "resultado")
+      ) {
+        const resultado = error.resultado as RegisterResultado;
+        setMessage(results[resultado]);
+      }
       setLoading(false);
     }
   };

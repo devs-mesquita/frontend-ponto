@@ -15,9 +15,9 @@ type Message = {
 };
 
 type Ponto = "entrada" | "inicio-intervalo" | "fim-intervalo" | "saida";
-type Resultado = "ok" | "timeout" | "complete" | "invalid-cpf";
-type APIResponse = {
-  resultado: Resultado;
+type CreateRegistroResultado = "ok" | "timeout" | "complete" | "invalid-cpf";
+type CreateRegistroAPIResponse = {
+  resultado: CreateRegistroResultado;
   tipo: Ponto;
 };
 const results = {
@@ -153,7 +153,7 @@ export default function Terminal() {
         throw err;
       }
 
-      const res: APIResponse = await result.json();
+      const res: CreateRegistroAPIResponse = await result.json();
 
       setCPF("");
       camera.srcObject = null;
@@ -172,8 +172,8 @@ export default function Terminal() {
 
       if (error instanceof Error) {
         setMessage(results["error"]);
-      } else if (errorFromApi<{ resultado: Resultado }>(error, "resultado")) {
-        const resultado = error.resultado as Resultado;
+      } else if (errorFromApi<{ resultado: CreateRegistroResultado }>(error, "resultado")) {
+        const resultado = error.resultado as CreateRegistroResultado;
         setMessage(results[resultado]);
       }
 
