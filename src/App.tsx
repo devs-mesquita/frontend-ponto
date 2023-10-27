@@ -83,6 +83,7 @@ export default function App() {
               </RequireAuth>
             }
           />
+          <Route path="home" element={<Navigate to="/" />} />
           <Route path="/404" element={<NotFound />} />
           <Route path="*" element={<Navigate to="/404" />} />
         </Route>
