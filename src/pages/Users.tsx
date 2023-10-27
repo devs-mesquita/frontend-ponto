@@ -1,14 +1,8 @@
-/*
-Tabela de Usuários:
-  - Paginação;
-  - Filtros;
-  - Ordenação;
-*/
 import errorFromApi from "@/utils/errorFromAPI";
 import { useAuthHeader, useAuthUser } from "react-auth-kit";
 import * as React from "react";
 import { useAtom } from "jotai";
-import { notificationAtom /* notificationInitialState */ } from "@/store";
+import { notificationAtom } from "@/store";
 import { Link, Navigate } from "react-router-dom";
 
 import type { UserWithSetor, Setor, AppDialog } from "@/types/interfaces";
@@ -35,7 +29,6 @@ import { Button } from "@/components/ui/button";
 
 import { UserDataTable } from "@/components/DataTables/UserDataTable";
 
-import TopNotification from "@/components/TopNotification";
 import { PlusIcon } from "lucide-react";
 
 type UserAPIResponse = {
@@ -103,7 +96,7 @@ export default function Configs() {
   const auth = useAuthUser();
   const authHeader = useAuthHeader();
 
-  const [notification, setNotification] = useAtom(notificationAtom);
+  const setNotification = useAtom(notificationAtom)[1];
   const [loading, setLoading] = React.useState<boolean>(false);
 
   const [setores, setSetores] = React.useState<Setor[]>([]);
@@ -532,7 +525,6 @@ export default function Configs() {
           message={dialog.message}
         />
       )}
-      {notification.message && <TopNotification />}
       {consultarPontos.isOpen && (
         <ConsultarPontos
           user={consultarPontos.user}

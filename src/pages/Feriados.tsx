@@ -37,7 +37,6 @@ import {
 
 import type { AppDialog } from "@/types/interfaces";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
-import TopNotification from "@/components/TopNotification";
 
 type Registro = {
   id: number;
@@ -79,7 +78,7 @@ export default function Feriados() {
   const auth = useAuthUser();
   const authHeader = useAuthHeader();
 
-  const [notification, setNotification] = useAtom(notificationAtom);
+  const setNotification = useAtom(notificationAtom)[1];
 
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: undefined,
@@ -495,7 +494,6 @@ export default function Feriados() {
           message={dialog.message}
         />
       )}
-      {notification.message && <TopNotification />}
     </>
   ) : (
     <Navigate to="/" />

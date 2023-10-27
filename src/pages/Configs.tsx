@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useAuthHeader, useSignOut } from "react-auth-kit";
 import errorFromApi from "@/utils/errorFromAPI";
-import { useAtom } from "jotai";
 import { notificationAtom } from "@/store";
+import { useAtom } from "jotai";
 
 type Message = {
   type: "" | "success" | "error" | "warning";
