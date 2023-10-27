@@ -53,8 +53,6 @@ export default function AlterarSetor({
     evt.preventDefault();
     if (setorID) {
       setLoading(true);
-      //setNotification(notificationInitialState);
-
       try {
         const res = await fetch(`${API_URL}/api/user/setor`, {
           method: "POST",

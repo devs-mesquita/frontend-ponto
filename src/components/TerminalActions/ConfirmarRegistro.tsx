@@ -95,7 +95,6 @@ export default function ConfirmarRegistro({
   const handleSubmit = async (evt: React.MouseEvent<HTMLButtonElement>) => {
     evt.preventDefault();
     setLoading(true);
-
     try {
       // Make FormData
       const formData = new FormData();

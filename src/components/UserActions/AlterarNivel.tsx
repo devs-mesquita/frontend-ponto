@@ -47,8 +47,6 @@ export default function AlterarNivel({ closePopup, user, refetch }: AtribuirFalt
     evt.preventDefault();
     if (nivel) {
       setLoading(true);
-      //setNotification(notificationInitialState);
-
       try {
         const res = await fetch(`${API_URL}/api/user/nivel`, {
           method: "POST",

@@ -50,7 +50,8 @@ export default function AtribuirFerias({
           locale: ptBR,
         });
       });
-
+      
+      setLoading(true);
       try {
         const res = await fetch(`${API_URL}/api/registro/ferias`, {
           method: "POST",
