@@ -41,7 +41,7 @@ export default function (
     },
   );
   doc.setFontSize(12);
-  doc.text(`Nome: ${user.name}`, 15, 25, {});
+  doc.text(`Nome: ${user.name.toUpperCase()}`, 15, 25, {});
   doc.text(`Setor: ${user.setor.nome}`, 15, 32);
   doc.text(`CPF: ${cpfWithSymbols}`, 15, 39);
 
