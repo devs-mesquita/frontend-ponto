@@ -71,6 +71,31 @@ type RegistroAPIResponse = {
 };
 type Resultado = "existente";
 
+type CreateRegistroResultado = "ok" | "existente";
+type CreateRegistroTipo = "feriado" | "facultativo";
+type CreateRegistroAPIResponse = {
+  resultado: CreateRegistroResultado;
+  tipo: CreateRegistroTipo;
+};
+const results = {
+  ok: {
+    message: "Registro criado com sucesso.",
+    type: "success",
+  },
+  existente: {
+    message: "Registro existente na data selecionada.",
+    type: "error",
+  },
+  error: {
+    message: "Ocorreu um erro.",
+    type: "error",
+  },
+} as const;
+const messages = {
+  feriado: "Registro de feriado criado com sucesso.",
+  facultativo: "Registro de ponto facultativo criado com sucesso.",
+} as const;
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Feriados() {
@@ -184,11 +209,13 @@ export default function Feriados() {
           throw err;
         }
 
-        setLoading(false);
+        const data: CreateRegistroAPIResponse = await res.json();
+
         setNotification({
-          message: "Registro criado com sucesso.",
-          type: "success",
+          ...results[data.resultado],
+          message: messages[data.tipo],
         });
+        setLoading(false);
         setDateNew(undefined);
         setTipoNew("");
         await fetchConsulta();
@@ -196,18 +223,9 @@ export default function Feriados() {
         console.error(error);
 
         if (error instanceof Error) {
-          setNotification({
-            message: "Ocorreu um erro.",
-            type: "error",
-          });
+          setNotification(results["error"]);
         } else if (errorFromApi<{ resultado: Resultado }>(error, "resultado")) {
-          const resultado = error.resultado as Resultado;
-          if (resultado === "existente") {
-            setNotification({
-              message: "Um registro já existe na data selecionada.",
-              type: "error",
-            });
-          }
+          setNotification(results[error.resultado]);
         }
 
         setLoading(false);
