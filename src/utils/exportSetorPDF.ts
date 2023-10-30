@@ -94,7 +94,7 @@ export default function (
 
     doc.setFontSize(16);
     doc.text(
-      `Planilha de Horário de ${fromDate} a ${toDate}`,
+      `PLANILHA DE HORÁRIO DE ${fromDate} A ${toDate}`,
       doc.internal.pageSize.width / 2,
       15,
       {
@@ -102,8 +102,8 @@ export default function (
       },
     );
     doc.setFontSize(12);
-    doc.text(`Nome: ${user.name.toUpperCase()}`, 15, 25, {});
-    doc.text(`Setor: ${user.setor.nome}`, 15, 32);
+    doc.text(`NOME: ${user.name.toUpperCase()}`, 15, 25, {});
+    doc.text(`SETOR: ${user.setor.nome}`, 15, 32);
     doc.text(`CPF: ${cpfWithSymbols}`, 15, 39);
 
     autoTable(doc, {
@@ -115,7 +115,7 @@ export default function (
       bodyStyles: {
         halign: "center",
       },
-      head: [["Data", "Entrada", "Ini. Interv.", "Fim. Interv", "Saída"]],
+      head: [["DATA", "ENTRADA", "INI. INTERV.", "FIM. INTERV", "SAÍDA"]],
       body: Object.keys(user.registrosTable).map((dateKey) => {
         const pontoDate = format(
           new Date(`${dateKey} 12:00:00`),
