@@ -121,7 +121,7 @@ export default function Register() {
       setLoading(false);
       signOut();
       setNotification({
-        message: "Senha alterada com sucesso.",
+        message: "Senha alterada com sucesso, efetue o acesso novamente.",
         type: "success",
       });
     } catch (error) {

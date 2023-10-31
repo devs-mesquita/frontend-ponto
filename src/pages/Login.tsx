@@ -2,6 +2,12 @@ import { useState } from "react";
 import { useSignIn, useIsAuthenticated } from "react-auth-kit";
 import { useNavigate, Navigate } from "react-router-dom";
 import errorFromApi from "@/utils/errorFromAPI";
+import {
+  notificationAtom,
+  notificationInitialState,
+  usingDefaultPasswordAtom,
+} from "@/store";
+import { useAtom } from "jotai";
 
 type Message = {
   type: "" | "success" | "error" | "warning";
@@ -31,12 +37,16 @@ type LoginAPIResponse = {
     cpf: string;
     email: string;
   };
+  default_password: boolean;
 };
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Login() {
   document.title = "Login";
+
+  const setNotification = useAtom(notificationAtom)[1];
+  const setUsingDefaultPassword = useAtom(usingDefaultPasswordAtom)[1];
 
   const isAuthenticated = useIsAuthenticated();
   const navigate = useNavigate();
@@ -98,7 +108,18 @@ export default function Login() {
         authState: { user: data.user },
       });
 
-      navigate("/");
+      if (data.default_password) {
+        setNotification({
+          message: "Altere sua senha para obter acesso ao sistema.",
+          type: "warning",
+        });
+        setUsingDefaultPassword(true);
+        navigate("/configs");
+      } else {
+        setNotification(notificationInitialState);
+        setUsingDefaultPassword(false);
+        navigate("/");
+      }
     } catch (error) {
       console.error(error);
       if (error instanceof Error) {

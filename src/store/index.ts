@@ -6,6 +6,8 @@ export const notificationAtom = atom<AppNotification>({
   type: "",
 });
 
+export const usingDefaultPasswordAtom = atom<boolean | null>(null);
+
 export const notificationInitialState: AppNotification = {
   message: "",
   type: "",
