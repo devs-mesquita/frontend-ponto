@@ -11,7 +11,7 @@ type FilteredRegistro = {
   "inicio-intervalo"?: string;
   saida?: string;
   falta?: string;
-  atestado?: string;
+  abono?: string;
   ferias?: string;
   feriado?: string;
   facultativo?: string;
@@ -31,22 +31,23 @@ export default function (
     6,
   )}.${user.cpf.slice(6, 9)}-${user.cpf.slice(9)}`;
 
-  doc.setFontSize(16);
+  doc.setFontSize(12);
   doc.text(
-    `PLANILHA DE HORÁRIO DE ${fromDate} A ${toDate}`,
+    `PLANILHA DE HORÁRIOS POR TRABALHADOR DE ${fromDate} A ${toDate}`,
     doc.internal.pageSize.width / 2,
-    15,
+    10,
     {
       align: "center",
     },
   );
-  doc.setFontSize(12);
-  doc.text(`NOME: ${user.name.toUpperCase()}`, 15, 25, {});
-  doc.text(`SETOR: ${user.setor.nome}`, 15, 32);
-  doc.text(`CPF: ${cpfWithSymbols}`, 15, 39);
+  doc.setFontSize(10);
+  doc.text(`NOME: ${user.name.toUpperCase()}`, 15, 18, {});
+  doc.text(`SETOR: ${user.setor.nome}`, 15, 24);
+  doc.text(`CPF: ${cpfWithSymbols}`, 15, 30);
+  // doc.text(`LINHA 4: TESTE DE ESPAÇO`, 15, 36);
 
   autoTable(doc, {
-    startY: 46,
+    startY: 40,
     headStyles: {
       fillColor: [30, 30, 30],
       halign: "center",
@@ -54,7 +55,9 @@ export default function (
     bodyStyles: {
       halign: "center",
     },
-    head: [["DATA", "ENTRADA", "INI. INTERV.", "FIM. INTERV", "SAÍDA"]],
+    head: [
+      ["DATA", "ENTRADA", "INÍCIO DE INTERVALO", "FIM DE INTERVALO", "SAÍDA"],
+    ],
     body: Object.keys(registrosTable).map((dateKey) => {
       const pontoDate = format(
         new Date(`${dateKey} 12:00:00`),
@@ -67,26 +70,10 @@ export default function (
       if (registrosTable[dateKey]?.ferias) {
         return [pontoDate, "FÉRIAS", "FÉRIAS", "FÉRIAS", "FÉRIAS"];
       }
-      if (
-        registrosTable[dateKey]?.feriado &&
-        !(
-          registrosTable[dateKey]?.entrada ||
-          registrosTable[dateKey]?.saida ||
-          registrosTable[dateKey]?.["fim-intervalo"] ||
-          registrosTable[dateKey]?.["inicio-intervalo"]
-        )
-      ) {
+      if (registrosTable[dateKey]?.feriado) {
         return [pontoDate, "FERIADO", "FERIADO", "FERIADO", "FERIADO"];
       }
-      if (
-        registrosTable[dateKey]?.facultativo &&
-        !(
-          registrosTable[dateKey]?.entrada ||
-          registrosTable[dateKey]?.saida ||
-          registrosTable[dateKey]?.["fim-intervalo"] ||
-          registrosTable[dateKey]?.["inicio-intervalo"]
-        )
-      ) {
+      if (registrosTable[dateKey]?.facultativo) {
         return [
           pontoDate,
           "FACULTATIVO",
@@ -95,8 +82,8 @@ export default function (
           "FACULTATIVO",
         ];
       }
-      if (registrosTable[dateKey]?.atestado) {
-        return [pontoDate, "ATESTADO", "ATESTADO", "ATESTADO", "ATESTADO"];
+      if (registrosTable[dateKey]?.abono) {
+        return [pontoDate, "ABONO", "ABONO", "ABONO", "ABONO"];
       }
       if (registrosTable[dateKey]?.falta) {
         return [pontoDate, "FALTA", "FALTA", "FALTA", "FALTA"];

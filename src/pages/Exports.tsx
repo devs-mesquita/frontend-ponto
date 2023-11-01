@@ -39,7 +39,7 @@ type Registro = {
     | "ferias"
     | "feriado"
     | "facultativo"
-    | "atestado"
+    | "abono"
     | "falta";
   data_hora: string;
 };
@@ -50,7 +50,7 @@ type FilteredRegistro = {
   "inicio-intervalo"?: string;
   saida?: string;
   falta?: string;
-  atestado?: string;
+  abono?: string;
   ferias?: string;
   feriado?: string;
   facultativo?: string;

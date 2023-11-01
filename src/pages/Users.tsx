@@ -9,8 +9,9 @@ import type { UserWithSetor, Setor, AppDialog } from "@/types/interfaces";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 import ConsultarPontos from "@/components/UserActions/ConsultarPontos";
-import AtribuirFalta from "@/components/UserActions/AtribuirFalta";
 import AtribuirFerias from "@/components/UserActions/AtribuirFerias";
+import AtribuirAbono from "@/components/UserActions/AtribuirAbono";
+import AtribuirFalta from "@/components/UserActions/AtribuirFalta";
 import AlterarNivel from "@/components/UserActions/AlterarNivel";
 import AlterarSetor from "@/components/UserActions/AlterarSetor";
 
@@ -21,6 +22,7 @@ import {
   SymbolIcon,
   AvatarIcon,
   IdCardIcon,
+  BackpackIcon
 } from "@radix-ui/react-icons";
 
 import { ColumnDef } from "@tanstack/react-table";
@@ -48,6 +50,12 @@ type ConsultaPontosPopup = {
   | { isOpen: false; user: undefined }
 );
 type AtribuirFaltaPopup = {
+  close: () => void;
+} & (
+  | { isOpen: true; user: UserWithSetor }
+  | { isOpen: false; user: undefined }
+);
+type AtribuirAbonoPopup = {
   close: () => void;
 } & (
   | { isOpen: true; user: UserWithSetor }
@@ -222,6 +230,20 @@ export default function Configs() {
     setAtribuirFalta((st) => ({ ...st, user, isOpen: true }));
   };
 
+  const atribuirAbonoInitialState: AtribuirAbonoPopup = {
+    isOpen: false,
+    close: () => {
+      setAtribuirAbono((st) => ({ ...st, user: undefined, isOpen: false }));
+    },
+    user: undefined,
+  };
+  const [atribuirAbono, setAtribuirAbono] = React.useState<AtribuirAbonoPopup>(
+    atribuirAbonoInitialState,
+  );
+  const handlePopupAtribuirAbono = (user: UserWithSetor) => {
+    setAtribuirAbono((st) => ({ ...st, user, isOpen: true }));
+  };
+
   const alterarNivelInitialState: AlterarNivelPopup = {
     isOpen: false,
     close: async () => {
@@ -376,6 +398,13 @@ export default function Configs() {
               onClick={() => handlePopupConsultarPontos(user)}
             >
               <MagnifyingGlassIcon className="h-5 w-5" />
+            </button>
+            <button
+              title="Atribuir abono."
+              className="rounded bg-emerald-500/80 p-2 text-red-50 shadow shadow-black/20 hover:bg-emerald-600/80"
+              onClick={() => handlePopupAtribuirAbono(user)}
+            >
+              <BackpackIcon className="h-5 w-5" />
             </button>
             <button
               title="Atribuir falta."
@@ -535,6 +564,12 @@ export default function Configs() {
         <AtribuirFerias
           user={atribuirFerias.user}
           closePopup={atribuirFerias.close}
+        />
+      )}
+      {atribuirAbono.isOpen && (
+        <AtribuirAbono
+          user={atribuirAbono.user}
+          closePopup={atribuirAbono.close}
         />
       )}
       {atribuirFalta.isOpen && (

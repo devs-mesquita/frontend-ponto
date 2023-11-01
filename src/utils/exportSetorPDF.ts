@@ -16,7 +16,7 @@ type Registro = {
     | "ferias"
     | "feriado"
     | "facultativo"
-    | "atestado"
+    | "abono"
     | "falta";
   data_hora: string;
 };
@@ -27,7 +27,7 @@ type FilteredRegistro = {
   "inicio-intervalo"?: string;
   saida?: string;
   falta?: string;
-  atestado?: string;
+  abono?: string;
   ferias?: string;
   feriado?: string;
   facultativo?: string;
@@ -92,19 +92,20 @@ export default function (
       doc.addPage("a4", "p");
     }
 
-    doc.setFontSize(16);
+    doc.setFontSize(12);
     doc.text(
-      `PLANILHA DE HORÁRIO DE ${fromDate} A ${toDate}`,
+      `PLANILHA DE HORÁRIOS POR TRABALHADOR DE ${fromDate} A ${toDate}`,
       doc.internal.pageSize.width / 2,
-      15,
+      10,
       {
         align: "center",
       },
     );
-    doc.setFontSize(12);
-    doc.text(`NOME: ${user.name.toUpperCase()}`, 15, 25, {});
-    doc.text(`SETOR: ${user.setor.nome}`, 15, 32);
-    doc.text(`CPF: ${cpfWithSymbols}`, 15, 39);
+    doc.setFontSize(10);
+    doc.text(`NOME: ${user.name.toUpperCase()}`, 15, 18, {});
+    doc.text(`SETOR: ${user.setor.nome}`, 15, 24);
+    doc.text(`CPF: ${cpfWithSymbols}`, 15, 30);
+    // doc.text(`LINHA 4: TESTE DE ESPAÇO`, 15, 36);
 
     autoTable(doc, {
       startY: 46,
@@ -128,26 +129,10 @@ export default function (
         if (user.registrosTable[dateKey]?.ferias) {
           return [pontoDate, "FÉRIAS", "FÉRIAS", "FÉRIAS", "FÉRIAS"];
         }
-        if (
-          feriadosTable[dateKey]?.feriado &&
-          !(
-            user.registrosTable[dateKey]?.entrada ||
-            user.registrosTable[dateKey]?.saida ||
-            user.registrosTable[dateKey]?.["fim-intervalo"] ||
-            user.registrosTable[dateKey]?.["inicio-intervalo"]
-          )
-        ) {
+        if (feriadosTable[dateKey]?.feriado) {
           return [pontoDate, "FERIADO", "FERIADO", "FERIADO", "FERIADO"];
         }
-        if (
-          feriadosTable[dateKey]?.facultativo &&
-          !(
-            user.registrosTable[dateKey]?.entrada ||
-            user.registrosTable[dateKey]?.saida ||
-            user.registrosTable[dateKey]?.["fim-intervalo"] ||
-            user.registrosTable[dateKey]?.["inicio-intervalo"]
-          )
-        ) {
+        if (feriadosTable[dateKey]?.facultativo) {
           return [
             pontoDate,
             "FACULTATIVO",
@@ -156,8 +141,8 @@ export default function (
             "FACULTATIVO",
           ];
         }
-        if (user.registrosTable[dateKey]?.atestado) {
-          return [pontoDate, "ATESTADO", "ATESTADO", "ATESTADO", "ATESTADO"];
+        if (user.registrosTable[dateKey]?.abono) {
+          return [pontoDate, "ABONO", "ABONO", "ABONO", "ABONO"];
         }
         if (user.registrosTable[dateKey]?.falta) {
           return [pontoDate, "FALTA", "FALTA", "FALTA", "FALTA"];

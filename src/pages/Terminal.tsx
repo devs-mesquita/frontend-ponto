@@ -42,8 +42,10 @@ type ConfirmarRegistroResultado =
   | "invalid-cpf"
   | "ferias"
   | "falta"
-  | "atestado"
-  | "unauthorized"
+  | "abono"
+  | "feriado"
+  | "facultativo"
+  | "unauthorized";
 
 type ConfirmarRegistroAPIResponse =
   | {
@@ -75,23 +77,27 @@ const results = {
     message: "Ocorreu um erro.",
   },
   ferias: {
-    type: "warning",
+    type: "error",
     message: "Registro de férias existente nesta data.",
   },
   feriado: {
-    type: "warning",
+    type: "error",
     message: "Registro de feriado existente nesta data.",
   },
+  facultativo: {
+    type: "error",
+    message: "Registro de ponto facultativo existente nesta data.",
+  },
   falta: {
-    type: "warning",
+    type: "error",
     message: "Registro de falta existente nesta data.",
   },
-  atestado: {
-    type: "warning",
-    message: "Registro de atestado existente nesta data.",
+  abono: {
+    type: "error",
+    message: "Registro de abono existente nesta data.",
   },
   unauthorized: {
-    type: "warning",
+    type: "error",
     message: "Permissão negada.",
   },
 } as const;

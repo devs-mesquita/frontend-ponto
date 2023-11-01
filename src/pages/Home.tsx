@@ -38,7 +38,7 @@ type Registro = {
     | "ferias"
     | "feriado"
     | "facultativo"
-    | "atestado"
+    | "abono"
     | "falta";
   data_hora: string;
 };
@@ -49,7 +49,7 @@ type FilteredRegistro = {
   "inicio-intervalo"?: string;
   saida?: string;
   falta?: string;
-  atestado?: string;
+  abono?: string;
   ferias?: string;
   feriado?: string;
   facultativo?: string;
@@ -294,13 +294,7 @@ export default function Home() {
                     </>
                   ) : (
                     <>
-                      {registros[dateKey]?.feriado &&
-                      !(
-                        registros[dateKey]?.entrada ||
-                        registros[dateKey]?.saida ||
-                        registros[dateKey]?.["fim-intervalo"] ||
-                        registros[dateKey]?.["inicio-intervalo"]
-                      ) ? (
+                      {registros[dateKey]?.feriado ? (
                         <>
                           <TableCell>FERIADO</TableCell>
                           <TableCell>FERIADO</TableCell>
@@ -309,13 +303,7 @@ export default function Home() {
                         </>
                       ) : (
                         <>
-                          {registros[dateKey]?.facultativo &&
-                          !(
-                            registros[dateKey]?.entrada ||
-                            registros[dateKey]?.saida ||
-                            registros[dateKey]?.["fim-intervalo"] ||
-                            registros[dateKey]?.["inicio-intervalo"]
-                          ) ? (
+                          {registros[dateKey]?.facultativo ? (
                             <>
                               <TableCell>FACULTATIVO</TableCell>
                               <TableCell>FACULTATIVO</TableCell>
@@ -324,12 +312,12 @@ export default function Home() {
                             </>
                           ) : (
                             <>
-                              {registros[dateKey]?.atestado ? (
+                              {registros[dateKey]?.abono ? (
                                 <>
-                                  <TableCell>ATESTADO</TableCell>
-                                  <TableCell>ATESTADO</TableCell>
-                                  <TableCell>ATESTADO</TableCell>
-                                  <TableCell>ATESTADO</TableCell>
+                                  <TableCell>ABONO</TableCell>
+                                  <TableCell>ABONO</TableCell>
+                                  <TableCell>ABONO</TableCell>
+                                  <TableCell>ABONO</TableCell>
                                 </>
                               ) : (
                                 <>
