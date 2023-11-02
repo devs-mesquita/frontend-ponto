@@ -14,6 +14,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { differenceInDays, addDays, format } from "date-fns";
 import { useAuthHeader } from "react-auth-kit";
 
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
 type AtribuirFeriasProps = {
   user: UserWithSetor;
   closePopup: () => void;
@@ -32,6 +35,11 @@ export default function AtribuirFerias({
     from: undefined,
     to: undefined,
   });
+  const [img, setImg] = React.useState<File | undefined | null>(undefined);
+
+  const handleChangeFile = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    setImg(evt.target.files?.item(0));
+  };
 
   const setNotification = useAtom(notificationAtom)[1];
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -39,9 +47,6 @@ export default function AtribuirFerias({
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
     if (date?.from && date.to) {
-      //setLoading(true);
-      //setNotification(notificationInitialState);
-
       const startDate = date.from;
       const endDate = date.to;
       const daysQuantity = differenceInDays(endDate, startDate) + 1;
@@ -50,17 +55,20 @@ export default function AtribuirFerias({
           locale: ptBR,
         });
       });
-      
+
       setLoading(true);
       try {
+        const formData = new FormData();
+        formData.append("cpf", user.cpf);
+        if (img) {
+          formData.append("img", img);
+        }
+        formData.append("dates", JSON.stringify(dates));
+
         const res = await fetch(`${API_URL}/api/registro/ferias`, {
           method: "POST",
-          body: JSON.stringify({
-            dates,
-            cpf: user.cpf,
-          }),
+          body: formData,
           headers: {
-            "Content-Type": "application/json",
             Accept: "application/json",
             Authorization: authHeader(),
           },
@@ -116,6 +124,9 @@ export default function AtribuirFerias({
             className="flex flex-col items-center justify-center gap-4"
             onSubmit={handleSubmit}
           >
+            <span className="text-white">
+              Selecione o período (máximo: 31 dias).
+            </span>
             <div
               className={cn(
                 "dark grid gap-2 rounded bg-slate-900 bg-gradient-to-br from-indigo-700/60 to-rose-500/60",
@@ -133,9 +144,12 @@ export default function AtribuirFerias({
                 locale={ptBR}
               />
             </div>
-            <span className="text-white">
-              Selecione o período (máximo: 31 dias).
-            </span>
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="img" className="text-center text-base text-white">
+                Imagem/Documento (opcional).
+              </Label>
+              <Input id="img" type="file" onChange={handleChangeFile} />
+            </div>
             <button
               disabled={loading}
               className="rounded bg-slate-500/40 bg-gradient-to-r px-4 py-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white disabled:bg-slate-500/10"

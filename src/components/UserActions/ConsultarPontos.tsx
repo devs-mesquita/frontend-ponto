@@ -383,16 +383,13 @@ export default function ConsultarPontos({
                                             evt.preventDefault();
                                             handleConfirmation(
                                               () =>
-                                                handleDelete(
-                                                  dateKey,
-                                                  "abono",
-                                                ),
+                                                handleDelete(dateKey, "abono"),
                                               "Deseja confirmar a remoção do abono?",
                                             );
                                           }}
                                         >
                                           <button
-                                            title="Remover feriado."
+                                            title="Remover abono."
                                             className="rounded bg-red-500/80 p-2 shadow shadow-black/20 hover:bg-red-600/80"
                                           >
                                             <TrashIcon className="h-4 w-4" />
@@ -423,7 +420,7 @@ export default function ConsultarPontos({
                                               }}
                                             >
                                               <button
-                                                title="Remover feriado."
+                                                title="Remover falta."
                                                 className="rounded bg-red-500/80 p-2 shadow shadow-black/20 hover:bg-red-600/80"
                                               >
                                                 <TrashIcon className="h-4 w-4" />

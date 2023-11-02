@@ -3,7 +3,6 @@ import * as React from "react";
 import {
   CalendarIcon,
   TrashIcon,
-  PlusCircledIcon,
   MagnifyingGlassIcon,
   TimerIcon,
 } from "@radix-ui/react-icons";
@@ -20,6 +19,9 @@ import errorFromApi from "@/utils/errorFromAPI";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
 import {
   Popover,
   PopoverContent,
@@ -182,6 +184,12 @@ export default function Feriados() {
 
   const [dateNew, setDateNew] = React.useState<Date>();
   const [tipoNew, setTipoNew] = React.useState<string>("");
+  const [img, setImg] = React.useState<File | undefined | null>(undefined);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleChangeFile = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    setImg(evt.target.files?.item(0));
+  };
 
   const handleSubmitNovo = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
@@ -190,15 +198,18 @@ export default function Feriados() {
       //setNotification(notificationInitialState);
 
       try {
+        const formData = new FormData();
+        formData.append("cpf", "sistema");
+        formData.append("tipo", tipoNew);
+        formData.append("date", dateNew.toDateString());
+        if (img) {
+          formData.append("img", img);
+        }
+
         const res = await fetch(`${API_URL}/api/registro`, {
           method: "POST",
-          body: JSON.stringify({
-            date: dateNew.toDateString(),
-            tipo: tipoNew,
-            cpf: "sistema",
-          }),
+          body: formData,
           headers: {
-            "Content-Type": "application/json",
             Accept: "application/json",
             Authorization: authHeader(),
           },
@@ -218,6 +229,11 @@ export default function Feriados() {
         setLoading(false);
         setDateNew(undefined);
         setTipoNew("");
+        setImg(null);
+        if (inputRef?.current) {
+          inputRef.current.value = "";
+        }
+
         await fetchConsulta();
       } catch (error) {
         console.error(error);
@@ -300,108 +316,66 @@ export default function Feriados() {
   return auth()?.user.nivel === "Super-Admin" ? (
     <>
       <div className="my-4 flex flex-1 flex-col gap-4 font-mono ">
-        <h1 className="text-center text-slate-200/90">
-          Feriados e Pontos Facultativos
-        </h1>
-        <div className="flex flex-col items-center justify-around gap-8 md:flex-row md:gap-4">
+        <h2 className="text-center text-slate-200/90">
+          Registrar novo feriado/ponto facultativo.
+        </h2>
+        <div className="flex flex-col items-center justify-around gap-8 md:flex-row md:items-start md:gap-4">
           <form
-            className="flex-2 flex flex-col items-center justify-center gap-2"
-            onSubmit={handleSubmitConsulta}
-          >
-            <h2 className="text-center text-slate-200/90">Consultar</h2>
-            <div className="flex flex-col items-center gap-2 md:flex-row">
-              <div className={cn("dark grid gap-2")}>
-                <Popover>
-                  <PopoverTrigger asChild className="dark">
-                    <Button
-                      id="date"
-                      variant={"outline"}
-                      className={cn(
-                        "dark w-[250px] justify-start text-left font-normal text-slate-100",
-                        !date && "text-muted-foreground",
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date?.from ? (
-                        date.to ? (
-                          <>
-                            {format(date.from, "dd/MM/yy", { locale: ptBR })} ~{" "}
-                            {format(date.to, "dd/MM/yy", { locale: ptBR })}
-                          </>
-                        ) : (
-                          format(date.from, "dd/MM/yy", { locale: ptBR })
-                        )
-                      ) : (
-                        <span>Selecione o período</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="dark w-auto bg-slate-800 bg-gradient-to-br from-indigo-700/30 to-rose-500/30 p-0 shadow shadow-black/30"
-                    align="start"
-                  >
-                    <Calendar
-                      className="dark"
-                      initialFocus
-                      mode="range"
-                      defaultMonth={date?.from}
-                      selected={date}
-                      onSelect={setDate}
-                      numberOfMonths={2}
-                      max={62}
-                      locale={ptBR}
-                      // disabled={{ after: new Date() }}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <button
-                disabled={loading}
-                className="rounded bg-slate-500/40 bg-gradient-to-r p-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white disabled:bg-slate-500/10"
-              >
-                {loading ? (
-                  <TimerIcon className="h-5 w-5 text-white/50" />
-                ) : (
-                  <MagnifyingGlassIcon className="h-5 w-5" />
-                )}
-              </button>
-            </div>
-          </form>
-          <form
-            className="flex-2 flex flex-col items-center justify-center gap-2"
+            className="flex-2 flex flex-col items-center gap-4 md:flex-row md:items-end"
             onSubmit={handleSubmitNovo}
           >
-            <h2 className="text-center text-slate-200/90">Novo</h2>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-[250px] justify-start text-left font-normal",
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dateNew ? (
-                    format(dateNew, "PPP", { locale: ptBR })
-                  ) : (
-                    <span>Selecione a data</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="dark w-auto bg-slate-800 bg-gradient-to-br from-indigo-700/30 to-rose-500/30 p-0 shadow shadow-black/30">
-                <Calendar
-                  className="dark"
-                  mode="single"
-                  selected={dateNew}
-                  onSelect={setDateNew}
-                  locale={ptBR}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col items-center gap-2">
+              <Label className="text-center text-base text-white">Data</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[250px] justify-start text-left font-normal",
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dateNew ? (
+                      format(dateNew, "PPP", { locale: ptBR })
+                    ) : (
+                      <span>Selecione a data</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="dark w-auto bg-slate-800 bg-gradient-to-br from-indigo-700/30 to-rose-500/30 p-0 shadow shadow-black/30">
+                  <Calendar
+                    className="dark"
+                    mode="single"
+                    selected={dateNew}
+                    onSelect={setDateNew}
+                    locale={ptBR}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <Label htmlFor="img" className="text-center text-base text-white">
+                Imagem/Documento (opcional)
+              </Label>
+              <Input
+                id="img"
+                type="file"
+                className="bg-slate-100"
+                onChange={handleChangeFile}
+                ref={inputRef}
+              />
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <Label
+                htmlFor="tipo"
+                className="text-center text-base text-white"
+              >
+                Tipo
+              </Label>
               <select
-                className="rounded border-2 bg-slate-200 px-2 py-1 text-slate-800 shadow shadow-black/20 outline-0 focus:border-indigo-600/70 disabled:bg-slate-200/40"
+                id="tipo"
+                className="rounded border-2 bg-slate-100 px-2 py-2 text-slate-800 shadow shadow-black/20 outline-0 focus:border-indigo-600/70 disabled:bg-slate-200/40"
                 disabled={loading}
                 required
                 value={tipoNew}
@@ -411,19 +385,78 @@ export default function Feriados() {
                 <option value="feriado">Feriado</option>
                 <option value="facultativo">Ponto Facultativo</option>
               </select>
-              <button
-                title="Criar novo feriado/ponto facultativo."
-                className="rounded bg-green-600 p-1 text-green-200 shadow shadow-black/20 hover:bg-green-500"
-              >
-                {loading ? (
-                  <TimerIcon className="h-5 w-5 text-white/50" />
-                ) : (
-                  <PlusCircledIcon className="h-5 w-5" />
-                )}
-              </button>
             </div>
+            <button
+              title="Criar novo feriado/ponto facultativo."
+              className="rounded bg-green-600 p-1 px-4 text-green-100 shadow shadow-black/20 hover:bg-green-500"
+            >
+              {loading ? "Carregando..." : "Criar"}
+            </button>
           </form>
         </div>
+        <form
+          className="flex-2 ml-4 mt-8 flex flex-col items-center justify-center gap-2 md:mr-auto"
+          onSubmit={handleSubmitConsulta}
+        >
+          <h2 className="text-center text-slate-200/90">Consultar</h2>
+          <div className="flex items-center gap-2">
+            <div className={cn("dark grid gap-2")}>
+              <Popover>
+                <PopoverTrigger asChild className="dark">
+                  <Button
+                    id="date"
+                    variant={"outline"}
+                    className={cn(
+                      "dark w-[250px] justify-start text-left font-normal text-slate-100",
+                      !date && "text-muted-foreground",
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date?.from ? (
+                      date.to ? (
+                        <>
+                          {format(date.from, "dd/MM/yy", { locale: ptBR })} ~{" "}
+                          {format(date.to, "dd/MM/yy", { locale: ptBR })}
+                        </>
+                      ) : (
+                        format(date.from, "dd/MM/yy", { locale: ptBR })
+                      )
+                    ) : (
+                      <span>Selecione o período</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="dark w-auto bg-slate-800 bg-gradient-to-br from-indigo-700/30 to-rose-500/30 p-0 shadow shadow-black/30"
+                  align="start"
+                >
+                  <Calendar
+                    className="dark"
+                    initialFocus
+                    mode="range"
+                    defaultMonth={date?.from}
+                    selected={date}
+                    onSelect={setDate}
+                    numberOfMonths={2}
+                    max={62}
+                    locale={ptBR}
+                    // disabled={{ after: new Date() }}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <button
+              disabled={loading}
+              className="rounded bg-slate-500/40 bg-gradient-to-r p-1 text-white/80 shadow shadow-black/20 hover:bg-slate-500/20 hover:text-white disabled:bg-slate-500/10"
+            >
+              {loading ? (
+                <TimerIcon className="h-5 w-5 text-white/50" />
+              ) : (
+                <MagnifyingGlassIcon className="h-5 w-5" />
+              )}
+            </button>
+          </div>
+        </form>
         <div className="mx-4 flex-1 rounded border border-white/20 bg-slate-800 bg-gradient-to-br from-indigo-700/20 to-rose-500/20">
           <Table className="flex-1 shadow shadow-black/20">
             <TableHeader className="sticky top-0 bg-slate-700 bg-gradient-to-r from-indigo-700/50 to-rose-700/30">

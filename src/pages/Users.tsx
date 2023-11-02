@@ -22,7 +22,7 @@ import {
   SymbolIcon,
   AvatarIcon,
   IdCardIcon,
-  BackpackIcon
+  BackpackIcon,
 } from "@radix-ui/react-icons";
 
 import { ColumnDef } from "@tanstack/react-table";
@@ -407,18 +407,18 @@ export default function Configs() {
               <BackpackIcon className="h-5 w-5" />
             </button>
             <button
-              title="Atribuir falta."
-              className="rounded bg-red-500/80 p-2 text-red-50 shadow shadow-black/20 hover:bg-red-600/80"
-              onClick={() => handlePopupAtribuirFalta(user)}
-            >
-              <ExclamationTriangleIcon className="h-5 w-5" />
-            </button>
-            <button
               title="Atribuir férias."
               className="rounded bg-green-500/80 p-2 text-green-50 shadow shadow-black/20 hover:bg-green-600/80"
               onClick={() => handlePopupAtribuirFerias(user)}
             >
               <StarFilledIcon className="h-5 w-5" />
+            </button>
+            <button
+              title="Atribuir falta."
+              className="rounded bg-red-500/80 p-2 text-red-50 shadow shadow-black/20 hover:bg-red-600/80"
+              onClick={() => handlePopupAtribuirFalta(user)}
+            >
+              <ExclamationTriangleIcon className="h-5 w-5" />
             </button>
             <form
               onSubmit={(evt) => {

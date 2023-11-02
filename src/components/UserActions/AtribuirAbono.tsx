@@ -7,7 +7,8 @@ import { ptBR } from "date-fns/locale";
 
 import { notificationAtom } from "@/store";
 import { useAtom } from "jotai";
-
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { useAuthHeader } from "react-auth-kit";
 
@@ -25,6 +26,11 @@ export default function AtribuirAbono({
 }: AtribuirAbonoProps) {
   const authHeader = useAuthHeader();
   const [date, setDate] = React.useState<Date | undefined>(undefined);
+  const [img, setImg] = React.useState<File | undefined | null>(undefined);
+
+  const handleChangeFile = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    setImg(evt.target.files?.item(0));
+  };
 
   const setNotification = useAtom(notificationAtom)[1];
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -34,15 +40,18 @@ export default function AtribuirAbono({
     if (date) {
       setLoading(true);
       try {
+        const formData = new FormData();
+        formData.append("cpf", user.cpf);
+        formData.append("tipo", "abono");
+        formData.append("date", date.toDateString());
+        if (img) {
+          formData.append("img", img);
+        }
+
         const res = await fetch(`${API_URL}/api/registro`, {
           method: "POST",
-          body: JSON.stringify({
-            date: date.toDateString(),
-            tipo: "abono",
-            cpf: user.cpf,
-          }),
+          body: formData,
           headers: {
-            "Content-Type": "application/json",
             Accept: "application/json",
             Authorization: authHeader(),
           },
@@ -98,6 +107,7 @@ export default function AtribuirAbono({
             className="flex-2 flex flex-col items-center justify-center gap-2"
             onSubmit={handleSubmit}
           >
+            <span className="text-white">Selecione a data.</span>
             <Calendar
               className="dark w-auto rounded bg-slate-800 bg-gradient-to-br from-indigo-700/30 to-rose-500/30 p-3 text-white shadow shadow-black/30"
               mode="single"
@@ -106,7 +116,12 @@ export default function AtribuirAbono({
               locale={ptBR}
               initialFocus
             />
-            <span className="text-white">Selecione a data.</span>
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="img" className="text-center text-base text-white">
+                Imagem/Documento (opcional).
+              </Label>
+              <Input id="img" type="file" onChange={handleChangeFile} />
+            </div>
             <div className="flex items-center gap-4">
               <button
                 disabled={loading}
