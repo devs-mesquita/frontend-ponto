@@ -5,16 +5,17 @@ import ptBR from "date-fns/locale/pt-BR";
 
 import { UserWithSetor } from "@/types/interfaces";
 
+type FRegistro = { data_hora: string; img: string };
 type FilteredRegistro = {
-  entrada?: string;
-  "fim-intervalo"?: string;
-  "inicio-intervalo"?: string;
-  saida?: string;
-  falta?: string;
-  abono?: string;
-  ferias?: string;
-  feriado?: string;
-  facultativo?: string;
+  entrada?: FRegistro;
+  "fim-intervalo"?: FRegistro;
+  "inicio-intervalo"?: FRegistro;
+  saida?: FRegistro;
+  falta?: FRegistro;
+  abono?: FRegistro;
+  ferias?: FRegistro;
+  feriado?: FRegistro;
+  facultativo?: FRegistro;
 };
 
 export default function (
@@ -92,7 +93,7 @@ export default function (
         pontoDate,
         registrosTable[dateKey]?.entrada
           ? addHours(
-              new Date(registrosTable[dateKey]?.entrada || ""),
+              new Date(registrosTable[dateKey]?.entrada?.data_hora || ""),
               user.setor.soma_entrada || 0,
             ).toLocaleTimeString("pt-BR", {
               hour: "2-digit",
@@ -101,7 +102,7 @@ export default function (
           : "---",
         registrosTable[dateKey]?.["inicio-intervalo"]
           ? new Date(
-              registrosTable[dateKey]?.["inicio-intervalo"] || "",
+              registrosTable[dateKey]?.["inicio-intervalo"]?.data_hora || "",
             ).toLocaleTimeString("pt-BR", {
               hour: "2-digit",
               minute: "2-digit",
@@ -109,7 +110,7 @@ export default function (
           : "---",
         registrosTable[dateKey]?.["fim-intervalo"]
           ? new Date(
-              registrosTable[dateKey]?.["fim-intervalo"] || "",
+              registrosTable[dateKey]?.["fim-intervalo"]?.data_hora || "",
             ).toLocaleTimeString("pt-BR", {
               hour: "2-digit",
               minute: "2-digit",
@@ -117,8 +118,10 @@ export default function (
           : "---",
         registrosTable[dateKey]?.saida
           ? addHours(
-              new Date(registrosTable[dateKey]?.saida || ""),
-              new Date(registrosTable[dateKey]?.saida || "").getDay() === 5
+              new Date(registrosTable[dateKey]?.saida?.data_hora || ""),
+              new Date(
+                registrosTable[dateKey]?.saida?.data_hora || "",
+              ).getDay() === 5
                 ? 0
                 : user.setor.soma_saida || 0,
             ).toLocaleTimeString("pt-BR", {

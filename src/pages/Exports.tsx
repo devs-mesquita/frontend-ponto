@@ -42,18 +42,20 @@ type Registro = {
     | "abono"
     | "falta";
   data_hora: string;
+  img: string;
 };
 
+type FRegistro = { data_hora: string; img: string };
 type FilteredRegistro = {
-  entrada?: string;
-  "fim-intervalo"?: string;
-  "inicio-intervalo"?: string;
-  saida?: string;
-  falta?: string;
-  abono?: string;
-  ferias?: string;
-  feriado?: string;
-  facultativo?: string;
+  entrada?: FRegistro;
+  "fim-intervalo"?: FRegistro;
+  "inicio-intervalo"?: FRegistro;
+  saida?: FRegistro;
+  falta?: FRegistro;
+  abono?: FRegistro;
+  ferias?: FRegistro;
+  feriado?: FRegistro;
+  facultativo?: FRegistro;
 };
 
 type RegistroAPIResponse = {
@@ -163,7 +165,10 @@ export default function Exports() {
               ...lista,
               [dateKey]: {
                 ...lista[dateKey],
-                [registro.tipo]: registro.data_hora,
+                [registro.tipo]: {
+                  img: registro.img,
+                  data_hora: registro.data_hora,
+                },
               },
             };
           },

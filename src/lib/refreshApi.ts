@@ -19,7 +19,7 @@ const refreshApi = createRefresh({
   interval: 10, // Refreshs the token in every 10 minutes
   refreshApiCallback: async ({ authToken, refreshToken }) => {
     try {
-      const res = await fetch(`${API_URL}/api/login`, {
+      const res = await fetch(`${API_URL}/api/refresh`, {
         method: "POST",
         body: JSON.stringify({
           refresh: refreshToken,
@@ -43,7 +43,7 @@ const refreshApi = createRefresh({
         newAuthToken: data.authorization.token,
         newAuthTokenExpireIn: data.authorization.expires_in,
         newRefreshTokenExpiresIn: data.authorization.expires_in,
-        newAuthUserState: data.user,
+        newAuthUserState: { user: data.user },
         newRefreshToken: data.authorization.token,
       };
     } catch (error) {

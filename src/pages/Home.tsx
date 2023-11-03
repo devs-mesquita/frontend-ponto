@@ -1,6 +1,6 @@
 import { useAuthHeader, useAuthUser } from "react-auth-kit";
 import * as React from "react";
-import { CalendarIcon } from "@radix-ui/react-icons";
+import { CalendarIcon, DownloadIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { ptBR } from "date-fns/locale";
@@ -41,18 +41,20 @@ type Registro = {
     | "abono"
     | "falta";
   data_hora: string;
+  img: string;
 };
 
+type FRegistro = { data_hora: string; img: string };
 type FilteredRegistro = {
-  entrada?: string;
-  "fim-intervalo"?: string;
-  "inicio-intervalo"?: string;
-  saida?: string;
-  falta?: string;
-  abono?: string;
-  ferias?: string;
-  feriado?: string;
-  facultativo?: string;
+  entrada?: FRegistro;
+  "fim-intervalo"?: FRegistro;
+  "inicio-intervalo"?: FRegistro;
+  saida?: FRegistro;
+  falta?: FRegistro;
+  abono?: FRegistro;
+  ferias?: FRegistro;
+  feriado?: FRegistro;
+  facultativo?: FRegistro;
 };
 
 type RegistroAPIResponse = {
@@ -130,6 +132,8 @@ export default function Home() {
         setLoading(false);
 
         const { registros, user } = data;
+        console.log(registros);
+        console.log("---");
 
         const registrosTable = registros.reduce(
           (lista, registro) => {
@@ -139,7 +143,10 @@ export default function Home() {
               ...lista,
               [dateKey]: {
                 ...lista[dateKey],
-                [registro.tipo]: registro.data_hora,
+                [registro.tipo]: {
+                  img: registro.img,
+                  data_hora: registro.data_hora,
+                },
               },
             };
           },
@@ -148,6 +155,7 @@ export default function Home() {
         setLastDate({ from: date.from, to: date.to });
         setRegistros(registrosTable);
         setUser(user);
+        console.log(registrosTable);
       } catch (error) {
         console.log(error);
         setLoading(false);
@@ -265,6 +273,9 @@ export default function Home() {
         <Table className="flex-1 shadow shadow-black/20">
           <TableHeader className="sticky top-0 bg-slate-700 bg-gradient-to-r from-indigo-700/50 to-rose-700/30">
             <TableRow>
+              <TableHead className="text-center text-white">
+                Comprovante
+              </TableHead>
               <TableHead className="text-center text-white">Data</TableHead>
               <TableHead className="text-center text-white">Entrada</TableHead>
               <TableHead className="text-center text-white">
@@ -280,13 +291,54 @@ export default function Home() {
             {registros &&
               Object.keys(registros).map((dateKey) => (
                 <TableRow className="text-center" key={crypto.randomUUID()}>
-                  <TableCell>
-                    {format(new Date(`${dateKey} 12:00:00`), "dd/MM - EEEEEE", {
-                      locale: ptBR,
-                    })}
-                  </TableCell>
                   {registros[dateKey]?.ferias ? (
                     <>
+                      <TableCell>
+                        {registros[dateKey]?.ferias?.img ? (
+                          <>
+                            {[
+                              "jpeg",
+                              "jpg",
+                              "png",
+                              "jfif",
+                              "webp",
+                              "tiff",
+                            ].includes(
+                              registros[dateKey]?.ferias?.img.split(".")[1] ||
+                                "",
+                            ) ? (
+                              <img
+                                className="mx-auto w-[64px]"
+                                src={`${API_URL}/${
+                                  registros[dateKey]?.ferias?.img || ""
+                                }`}
+                              />
+                            ) : (
+                              <a
+                                target="_blank"
+                                href={`${API_URL}/${
+                                  registros[dateKey]?.ferias?.img || ""
+                                }`}
+                                download
+                                className="text-white"
+                              >
+                                <DownloadIcon className="mx-auto h-5 w-5" />
+                              </a>
+                            )}
+                          </>
+                        ) : (
+                          "N/A"
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {format(
+                          new Date(`${dateKey} 12:00:00`),
+                          "dd/MM - EEEEEE",
+                          {
+                            locale: ptBR,
+                          },
+                        )}
+                      </TableCell>
                       <TableCell>FÉRIAS</TableCell>
                       <TableCell>FÉRIAS</TableCell>
                       <TableCell>FÉRIAS</TableCell>
@@ -296,6 +348,53 @@ export default function Home() {
                     <>
                       {registros[dateKey]?.feriado ? (
                         <>
+                          <TableCell>
+                            {registros[dateKey]?.feriado?.img ? (
+                              <>
+                                {[
+                                  "jpeg",
+                                  "jpg",
+                                  "png",
+                                  "jfif",
+                                  "webp",
+                                  "tiff",
+                                ].includes(
+                                  registros[dateKey]?.feriado?.img.split(
+                                    ".",
+                                  )[1] || "",
+                                ) ? (
+                                  <img
+                                    className="mx-auto w-[64px]"
+                                    src={`${API_URL}/${
+                                      registros[dateKey]?.feriado?.img || ""
+                                    }`}
+                                  />
+                                ) : (
+                                  <a
+                                    target="_blank"
+                                    href={`${API_URL}/${
+                                      registros[dateKey]?.feriado?.img || ""
+                                    }`}
+                                    download
+                                    className="text-white"
+                                  >
+                                    <DownloadIcon className="mx-auto h-5 w-5" />
+                                  </a>
+                                )}
+                              </>
+                            ) : (
+                              "N/A"
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {format(
+                              new Date(`${dateKey} 12:00:00`),
+                              "dd/MM - EEEEEE",
+                              {
+                                locale: ptBR,
+                              },
+                            )}
+                          </TableCell>
                           <TableCell>FERIADO</TableCell>
                           <TableCell>FERIADO</TableCell>
                           <TableCell>FERIADO</TableCell>
@@ -305,6 +404,55 @@ export default function Home() {
                         <>
                           {registros[dateKey]?.facultativo ? (
                             <>
+                              <TableCell>
+                                {registros[dateKey]?.facultativo?.img ? (
+                                  <>
+                                    {[
+                                      "jpeg",
+                                      "jpg",
+                                      "png",
+                                      "jfif",
+                                      "webp",
+                                      "tiff",
+                                    ].includes(
+                                      registros[
+                                        dateKey
+                                      ]?.facultativo?.img.split(".")[1] || "",
+                                    ) ? (
+                                      <img
+                                        className="mx-auto w-[64px]"
+                                        src={`${API_URL}/${
+                                          registros[dateKey]?.facultativo
+                                            ?.img || ""
+                                        }`}
+                                      />
+                                    ) : (
+                                      <a
+                                        target="_blank"
+                                        href={`${API_URL}/${
+                                          registros[dateKey]?.facultativo
+                                            ?.img || ""
+                                        }`}
+                                        download
+                                        className="text-white"
+                                      >
+                                        <DownloadIcon className="mx-auto h-5 w-5" />
+                                      </a>
+                                    )}
+                                  </>
+                                ) : (
+                                  "N/A"
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {format(
+                                  new Date(`${dateKey} 12:00:00`),
+                                  "dd/MM - EEEEEE",
+                                  {
+                                    locale: ptBR,
+                                  },
+                                )}
+                              </TableCell>
                               <TableCell>FACULTATIVO</TableCell>
                               <TableCell>FACULTATIVO</TableCell>
                               <TableCell>FACULTATIVO</TableCell>
@@ -314,6 +462,55 @@ export default function Home() {
                             <>
                               {registros[dateKey]?.abono ? (
                                 <>
+                                  <TableCell>
+                                    {registros[dateKey]?.abono?.img ? (
+                                      <>
+                                        {[
+                                          "jpeg",
+                                          "jpg",
+                                          "png",
+                                          "jfif",
+                                          "webp",
+                                          "tiff",
+                                        ].includes(
+                                          registros[dateKey]?.abono?.img.split(
+                                            ".",
+                                          )[1] || "",
+                                        ) ? (
+                                          <img
+                                            className="mx-auto w-[64px]"
+                                            src={`${API_URL}/${
+                                              registros[dateKey]?.abono?.img ||
+                                              ""
+                                            }`}
+                                          />
+                                        ) : (
+                                          <a
+                                            target="_blank"
+                                            href={`${API_URL}/${
+                                              registros[dateKey]?.abono?.img ||
+                                              ""
+                                            }`}
+                                            download
+                                            className="text-white"
+                                          >
+                                            <DownloadIcon className="mx-auto h-5 w-5" />
+                                          </a>
+                                        )}
+                                      </>
+                                    ) : (
+                                      "N/A"
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
+                                    {format(
+                                      new Date(`${dateKey} 12:00:00`),
+                                      "dd/MM - EEEEEE",
+                                      {
+                                        locale: ptBR,
+                                      },
+                                    )}
+                                  </TableCell>
                                   <TableCell>ABONO</TableCell>
                                   <TableCell>ABONO</TableCell>
                                   <TableCell>ABONO</TableCell>
@@ -323,6 +520,55 @@ export default function Home() {
                                 <>
                                   {registros[dateKey]?.falta ? (
                                     <>
+                                      <TableCell>
+                                        {registros[dateKey]?.falta?.img ? (
+                                          <>
+                                            {[
+                                              "jpeg",
+                                              "jpg",
+                                              "png",
+                                              "jfif",
+                                              "webp",
+                                              "tiff",
+                                            ].includes(
+                                              registros[
+                                                dateKey
+                                              ]?.falta?.img.split(".")[1] || "",
+                                            ) ? (
+                                              <img
+                                                className="mx-auto w-[64px]"
+                                                src={`${API_URL}/${
+                                                  registros[dateKey]?.falta
+                                                    ?.img || ""
+                                                }`}
+                                              />
+                                            ) : (
+                                              <a
+                                                target="_blank"
+                                                href={`${API_URL}/${
+                                                  registros[dateKey]?.falta
+                                                    ?.img || ""
+                                                }`}
+                                                download
+                                                className="text-white"
+                                              >
+                                                <DownloadIcon className="mx-auto h-5 w-5" />
+                                              </a>
+                                            )}
+                                          </>
+                                        ) : (
+                                          "N/A"
+                                        )}
+                                      </TableCell>
+                                      <TableCell>
+                                        {format(
+                                          new Date(`${dateKey} 12:00:00`),
+                                          "dd/MM - EEEEEE",
+                                          {
+                                            locale: ptBR,
+                                          },
+                                        )}
+                                      </TableCell>
                                       <TableCell>FALTA</TableCell>
                                       <TableCell>FALTA</TableCell>
                                       <TableCell>FALTA</TableCell>
@@ -331,11 +577,61 @@ export default function Home() {
                                   ) : (
                                     <>
                                       <TableCell>
+                                        {registros[dateKey]?.entrada?.img ? (
+                                          <>
+                                            {[
+                                              "jpeg",
+                                              "jpg",
+                                              "png",
+                                              "jfif",
+                                              "webp",
+                                              "tiff",
+                                            ].includes(
+                                              registros[
+                                                dateKey
+                                              ]?.entrada?.img.split(".")[1] ||
+                                                "",
+                                            ) ? (
+                                              <img
+                                                className="mx-auto w-[64px]"
+                                                src={`${API_URL}/${
+                                                  registros[dateKey]?.entrada
+                                                    ?.img || ""
+                                                }`}
+                                              />
+                                            ) : (
+                                              <a
+                                                target="_blank"
+                                                href={`${API_URL}/${
+                                                  registros[dateKey]?.entrada
+                                                    ?.img || ""
+                                                }`}
+                                                download
+                                                className="text-white"
+                                              >
+                                                <DownloadIcon className="mx-auto h-5 w-5" />
+                                              </a>
+                                            )}
+                                          </>
+                                        ) : (
+                                          "N/A"
+                                        )}
+                                      </TableCell>
+                                      <TableCell>
+                                        {format(
+                                          new Date(`${dateKey} 12:00:00`),
+                                          "dd/MM - EEEEEE",
+                                          {
+                                            locale: ptBR,
+                                          },
+                                        )}
+                                      </TableCell>
+                                      <TableCell>
                                         {registros[dateKey]?.entrada
                                           ? addHours(
                                               new Date(
-                                                registros[dateKey]?.entrada ||
-                                                  "",
+                                                registros[dateKey]?.entrada
+                                                  ?.data_hora || "",
                                               ),
                                               auth()?.user.setor.soma_entrada ||
                                                 0,
@@ -352,7 +648,7 @@ export default function Home() {
                                           ? new Date(
                                               registros[dateKey]?.[
                                                 "inicio-intervalo"
-                                              ] || "",
+                                              ]?.data_hora || "",
                                             ).toLocaleTimeString("pt-BR", {
                                               hour: "2-digit",
                                               minute: "2-digit",
@@ -364,7 +660,7 @@ export default function Home() {
                                           ? new Date(
                                               registros[dateKey]?.[
                                                 "fim-intervalo"
-                                              ] || "",
+                                              ]?.data_hora || "",
                                             ).toLocaleTimeString("pt-BR", {
                                               hour: "2-digit",
                                               minute: "2-digit",
@@ -375,10 +671,12 @@ export default function Home() {
                                         {registros[dateKey]?.saida
                                           ? addHours(
                                               new Date(
-                                                registros[dateKey]?.saida || "",
+                                                registros[dateKey]?.saida
+                                                  ?.data_hora || "",
                                               ),
                                               new Date(
-                                                registros[dateKey]?.saida || "",
+                                                registros[dateKey]?.saida
+                                                  ?.data_hora || "",
                                               ).getDay() === 5
                                                 ? 0
                                                 : auth()?.user.setor

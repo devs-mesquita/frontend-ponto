@@ -5,6 +5,7 @@ import {
   TrashIcon,
   MagnifyingGlassIcon,
   TimerIcon,
+  DownloadIcon,
 } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
@@ -54,18 +55,20 @@ type Registro = {
     | "abono"
     | "falta";
   data_hora: string;
+  img: string;
 };
 
+type FRegistro = { data_hora: string; img: string };
 type FilteredRegistro = {
-  entrada?: string;
-  "fim-intervalo"?: string;
-  "inicio-intervalo"?: string;
-  saida?: string;
-  falta?: string;
-  abono?: string;
-  ferias?: string;
-  feriado?: string;
-  facultativo?: string;
+  entrada?: FRegistro;
+  "fim-intervalo"?: FRegistro;
+  "inicio-intervalo"?: FRegistro;
+  saida?: FRegistro;
+  falta?: FRegistro;
+  abono?: FRegistro;
+  ferias?: FRegistro;
+  feriado?: FRegistro;
+  facultativo?: FRegistro;
 };
 
 type RegistroAPIResponse = {
@@ -156,7 +159,10 @@ export default function Feriados() {
               ...lista,
               [dateKey]: {
                 ...lista[dateKey],
-                [registro.tipo]: registro.data_hora,
+                [registro.tipo]: {
+                  img: registro.img,
+                  data_hora: registro.data_hora,
+                },
               },
             };
           },
@@ -461,6 +467,9 @@ export default function Feriados() {
           <Table className="flex-1 shadow shadow-black/20">
             <TableHeader className="sticky top-0 bg-slate-700 bg-gradient-to-r from-indigo-700/50 to-rose-700/30">
               <TableRow>
+                <TableHead className="text-center text-white">
+                  Comprovante
+                </TableHead>
                 <TableHead className="text-center text-white">Data</TableHead>
                 <TableHead className="text-center text-white">Tipo</TableHead>
                 <TableHead className="text-center text-white">Ações</TableHead>
@@ -470,18 +479,56 @@ export default function Feriados() {
               {registros &&
                 Object.keys(registros).map((dateKey) => (
                   <TableRow className="text-center" key={crypto.randomUUID()}>
-                    <TableCell>
-                      {format(
-                        new Date(`${dateKey} 12:00:00`),
-                        "dd/MM - EEEEEE",
-                        {
-                          locale: ptBR,
-                        },
-                      )}
-                    </TableCell>
                     <>
                       {registros[dateKey]?.feriado ? (
                         <>
+                          <TableCell>
+                            {registros[dateKey]?.feriado?.img ? (
+                              <>
+                                {[
+                                  "jpeg",
+                                  "jpg",
+                                  "png",
+                                  "jfif",
+                                  "webp",
+                                  "tiff",
+                                ].includes(
+                                  registros[dateKey]?.feriado?.img.split(
+                                    ".",
+                                  )[1] || "",
+                                ) ? (
+                                  <img
+                                    className="mx-auto w-[64px]"
+                                    src={`${API_URL}/${
+                                      registros[dateKey]?.feriado?.img || ""
+                                    }`}
+                                  />
+                                ) : (
+                                  <a
+                                    target="_blank"
+                                    href={`${API_URL}/${
+                                      registros[dateKey]?.feriado?.img || ""
+                                    }`}
+                                    download
+                                    className=" text-white"
+                                  >
+                                    <DownloadIcon className="mx-auto h-4 w-4" />
+                                  </a>
+                                )}
+                              </>
+                            ) : (
+                              "N/A"
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {format(
+                              new Date(`${dateKey} 12:00:00`),
+                              "dd/MM - EEEEEE",
+                              {
+                                locale: ptBR,
+                              },
+                            )}
+                          </TableCell>
                           <TableCell>FERIADO</TableCell>
                           <TableCell>
                             <form
@@ -506,6 +553,55 @@ export default function Feriados() {
                         <>
                           {registros[dateKey]?.facultativo ? (
                             <>
+                              <TableCell>
+                                {registros[dateKey]?.facultativo?.img ? (
+                                  <>
+                                    {[
+                                      "jpeg",
+                                      "jpg",
+                                      "png",
+                                      "jfif",
+                                      "webp",
+                                      "tiff",
+                                    ].includes(
+                                      registros[
+                                        dateKey
+                                      ]?.facultativo?.img.split(".")[1] || "",
+                                    ) ? (
+                                      <img
+                                        className="mx-auto w-[64px]"
+                                        src={`${API_URL}/${
+                                          registros[dateKey]?.facultativo
+                                            ?.img || ""
+                                        }`}
+                                      />
+                                    ) : (
+                                      <a
+                                        target="_blank"
+                                        href={`${API_URL}/${
+                                          registros[dateKey]?.facultativo
+                                            ?.img || ""
+                                        }`}
+                                        download
+                                        className=" text-white"
+                                      >
+                                        <DownloadIcon className="mx-auto h-4 w-4" />
+                                      </a>
+                                    )}
+                                  </>
+                                ) : (
+                                  "N/A"
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {format(
+                                  new Date(`${dateKey} 12:00:00`),
+                                  "dd/MM - EEEEEE",
+                                  {
+                                    locale: ptBR,
+                                  },
+                                )}
+                              </TableCell>
                               <TableCell>FACULTATIVO</TableCell>
                               <TableCell>
                                 <form
