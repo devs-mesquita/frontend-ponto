@@ -99,7 +99,7 @@ const results = {
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function Configs() {
+export default function Users() {
   document.title = "Usuários";
   const auth = useAuthUser();
   const authHeader = useAuthHeader();
@@ -512,16 +512,6 @@ export default function Configs() {
               <PlusIcon className="h-5 w-5" />
               Novo Usuário
             </Link>
-            {auth()?.user.nivel === "Super-Admin" && (
-              <Link
-                to="/setores/create"
-                title="Criar novo setor."
-                className="flex items-center gap-2 rounded bg-blue-500/80 px-2 py-1 text-base text-blue-50 shadow shadow-black/20 hover:bg-blue-600/80"
-              >
-                <PlusIcon className="h-5 w-5" />
-                Novo Setor
-              </Link>
-            )}
           </div>
         </div>
         {message.message.length > 0 && (

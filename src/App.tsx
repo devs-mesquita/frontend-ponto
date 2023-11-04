@@ -11,6 +11,7 @@ import Configs from "./pages/Configs";
 import NotFound from "./pages/NotFound";
 import Users from "./pages/Users";
 import Exports from "./pages/Exports";
+import Setores from "./pages/Setores";
 import SetorCreate from "./pages/SetorCreate";
 
 export default function App() {
@@ -35,7 +36,7 @@ export default function App() {
             }
           />
           <Route
-            path="configs"
+            path="changepassword"
             element={
               <RequireAuth loginPath="/login">
                 <Configs />
@@ -63,6 +64,14 @@ export default function App() {
             element={
               <RequireAuth loginPath="/login">
                 <Users />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="setores"
+            element={
+              <RequireAuth loginPath="/login">
+                <Setores />
               </RequireAuth>
             }
           />

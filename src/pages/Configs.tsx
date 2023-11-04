@@ -51,8 +51,8 @@ const results = {
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function Register() {
-  document.title = "Registrar Usuário";
+export default function ChangePassword() {
+  document.title = "Alterar Senha";
 
   const authHeader = useAuthHeader();
   const signOut = useSignOut();

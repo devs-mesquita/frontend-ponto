@@ -1,5 +1,13 @@
 import { useSignOut, useIsAuthenticated, useAuthUser } from "react-auth-kit";
 import { NavLink } from "react-router-dom";
+import {
+  BuildingIcon,
+  KeyRoundIcon,
+  HomeIcon,
+  PalmtreeIcon,
+  FileDownIcon,
+  UsersIcon,
+} from "lucide-react";
 
 export default function Navbar() {
   const signOut = useSignOut();
@@ -26,13 +34,14 @@ export default function Navbar() {
         <>
           <NavLink
             to="/"
+            title="Página Inicial"
             className={({ isActive }) =>
               `${
                 isActive ? "text-white" : "text-white/60 hover:text-white/80"
               } text-center`
             }
           >
-            Home
+            <HomeIcon className="h-6 w-6" />
           </NavLink>
           <div className="ml-auto flex flex-col-reverse items-end gap-4 py-4 md:flex-row md:items-center md:gap-16 md:py-0">
             <div className="ml-auto flex flex-col items-center gap-8 md:flex-row">
@@ -40,6 +49,7 @@ export default function Navbar() {
                 <>
                   <NavLink
                     to="/exports"
+                    title="Exportações em PDF."
                     className={({ isActive }) =>
                       `${
                         isActive
@@ -48,10 +58,11 @@ export default function Navbar() {
                       }`
                     }
                   >
-                    Exportações
+                    <FileDownIcon className="h-6 w-6" />
                   </NavLink>
                   <NavLink
                     to="/users"
+                    title="Usuários."
                     className={({ isActive }) =>
                       `${
                         isActive
@@ -60,14 +71,15 @@ export default function Navbar() {
                       }`
                     }
                   >
-                    Usuários
+                    <UsersIcon className="h-6 w-6" />
                   </NavLink>
                 </>
               )}
               {auth()?.user.nivel === "Super-Admin" && (
                 <>
                   <NavLink
-                    to="/feriados"
+                    to="/setores"
+                    title="Setores."
                     className={({ isActive }) =>
                       `${
                         isActive
@@ -76,12 +88,26 @@ export default function Navbar() {
                       }`
                     }
                   >
-                    Feriados
+                    <BuildingIcon className="h-6 w-6" />
+                  </NavLink>
+                  <NavLink
+                    to="/feriados"
+                    title="Feriados e pontos facultativos."
+                    className={({ isActive }) =>
+                      `${
+                        isActive
+                          ? "text-white"
+                          : "text-white/60 hover:text-white/80"
+                      }`
+                    }
+                  >
+                    <PalmtreeIcon className="h-6 w-6" />
                   </NavLink>
                 </>
               )}
               <NavLink
-                to="/configs"
+                to="/changepassword"
+                title="Alterar senha."
                 className={({ isActive }) =>
                   `${
                     isActive
@@ -90,7 +116,7 @@ export default function Navbar() {
                   }`
                 }
               >
-                Configurações
+                <KeyRoundIcon className="h-6 w-6" />
               </NavLink>
             </div>
             <button
