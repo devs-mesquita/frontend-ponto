@@ -114,7 +114,7 @@ export default function Login() {
           type: "warning",
         });
         setUsingDefaultPassword(true);
-        navigate("/configs");
+        navigate("/changepassword");
       } else {
         setNotification(notificationInitialState);
         setUsingDefaultPassword(false);

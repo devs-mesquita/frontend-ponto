@@ -36,7 +36,7 @@ export default function Layout() {
           message: "Altere sua senha para obter acesso ao sistema.",
           type: "warning",
         });
-        navigate("/configs");
+        navigate("/changepassword");
       }
 
       if (usingDefaultPassword === null) {
@@ -63,7 +63,7 @@ export default function Layout() {
               type: "warning",
             });
             setUsingDefaultPassword(true);
-            navigate("/configs");
+            navigate("/changepassword");
           } else if (data.resultado === "not-found") {
             setNotification({
               type: "error",

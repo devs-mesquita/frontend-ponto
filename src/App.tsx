@@ -7,7 +7,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Feriados from "./pages/Feriados";
-import Configs from "./pages/Configs";
+import ChangePassword from "./pages/ChangePassword";
 import NotFound from "./pages/NotFound";
 import Users from "./pages/Users";
 import Exports from "./pages/Exports";
@@ -39,7 +39,7 @@ export default function App() {
             path="changepassword"
             element={
               <RequireAuth loginPath="/login">
-                <Configs />
+                <ChangePassword />
               </RequireAuth>
             }
           />

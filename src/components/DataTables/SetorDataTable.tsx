@@ -55,7 +55,7 @@ export function SetorDataTable<TData, TValue>({
   });
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col overflow-auto">
       <div className="flex items-center justify-between">
         <Input
           disabled={data.length === 0}

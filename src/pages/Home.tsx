@@ -269,7 +269,7 @@ export default function Home() {
           Exportar PDF
         </button>
       )}
-      <div className="mx-4 flex-1 rounded border border-white/20 bg-slate-800 bg-gradient-to-br from-indigo-700/20 to-rose-500/20">
+      <div className="mx-4 flex-1 overflow-auto rounded border border-white/20 bg-slate-800 bg-gradient-to-br from-indigo-700/20 to-rose-500/20">
         <Table className="flex-1 shadow shadow-black/20">
           <TableHeader className="sticky top-0 bg-slate-700 bg-gradient-to-r from-indigo-700/50 to-rose-700/30">
             <TableRow>
