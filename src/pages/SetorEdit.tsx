@@ -1,15 +1,14 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuthUser, useAuthHeader } from "react-auth-kit";
-import { Navigate } from "react-router-dom";
+import { Navigate, useParams, useNavigate } from "react-router-dom";
 import errorFromApi from "@/utils/errorFromAPI";
 import InputMask from "react-input-mask";
+import { Setor } from "@/types/interfaces";
+import { notificationAtom } from "@/store";
+import { useAtom } from "jotai";
 
-type ViaCEPData = {
-  cep: string;
-  logradouro: string;
-  bairro: string;
-  localidade: string;
-  uf: string;
+type ViewSetorAPIResponse = {
+  setor: Setor;
 };
 type Message = {
   type: "" | "success" | "error" | "warning";
@@ -26,7 +25,7 @@ type CreateSetorAPIResponse = {
 };
 const results = {
   ok: {
-    message: "Setor criado com sucesso.",
+    message: "Setor modificado com sucesso.",
     type: "success",
   },
   existent: {
@@ -45,12 +44,15 @@ const results = {
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function SetorCreate() {
-  document.title = "Novo Setor";
+export default function SetorEdit() {
+  document.title = "Modificar Setor";
 
   const auth = useAuthUser();
   const authHeader = useAuthHeader();
+  const { setorId } = useParams();
 
+  const navigate = useNavigate();
+  const setNotification = useAtom(notificationAtom)[1];
   const [loading, setLoading] = useState<boolean>(false);
 
   const messageInit: Message = {
@@ -60,6 +62,7 @@ export default function SetorCreate() {
   const [message, setMessage] = useState<Message>(messageInit);
 
   const formInit = {
+    setor_id: 0,
     nome: "",
     empresa: "",
     cnpj: "",
@@ -86,6 +89,56 @@ export default function SetorCreate() {
     }));
   };
 
+  useEffect(() => {
+    const getSetor = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${API_URL}/api/setores/${setorId}`, {
+          headers: {
+            Authorization: authHeader(),
+            Accept: "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw err;
+        }
+
+        const { setor }: ViewSetorAPIResponse = await res.json();
+
+        setForm({
+          setor_id: setor.id,
+          nome: setor.nome,
+          empresa: setor.empresa,
+          cnpj: setor.cnpj,
+          cnae: setor.cnae,
+          visto_fiscal: setor.visto_fiscal,
+          cep: setor.cep,
+          logradouro: setor.logradouro,
+          numero_logradouro: setor.numero_logradouro,
+          complemento: setor.complemento,
+          bairro: setor.bairro,
+          cidade: setor.cidade,
+          uf: setor.uf,
+          soma_entrada: setor.soma_entrada,
+          soma_saida: setor.soma_saida,
+        });
+
+        setLoading(false);
+      } catch (error) {
+        setMessage({
+          message: "Ocorreu um erro, atualize a página para tentar novamente.",
+          type: "error",
+        });
+        //setLoading(false);
+        console.error(error);
+      }
+    };
+
+    getSetor();
+  }, []);
+
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
     setMessage(messageInit);
@@ -93,11 +146,15 @@ export default function SetorCreate() {
     if (!form.nome) return;
 
     try {
-      const res = await fetch(`${API_URL}/api/setores`, {
+      const res = await fetch(`${API_URL}/api/setores/update`, {
         method: "POST",
         body: JSON.stringify({
           ...form,
-          cnpj: form.cnpj.replace("-", "").replace(".", "").replace(".", "").replace("/", ""),
+          cnpj: form.cnpj
+            .replace("-", "")
+            .replace(".", "")
+            .replace(".", "")
+            .replace("/", ""),
           cep: form.cep.replace("-", ""),
           cnae: form.cnae.replace("/", "").replace("-", ""),
         }),
@@ -114,9 +171,9 @@ export default function SetorCreate() {
       }
 
       const data: CreateSetorAPIResponse = await res.json();
-      setMessage(results[data.resultado]);
-      setForm(formInit);
-      setLoading(false);
+      setNotification(results[data.resultado]);
+      navigate("/setores");
+      // setLoading(false);
     } catch (error) {
       console.error(error);
 
@@ -129,36 +186,6 @@ export default function SetorCreate() {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    const fetchViaCEP = async () => {
-      if (form.cep.length !== 9) return;
-
-      try {
-        const res = await fetch(
-          `https://viacep.com.br/ws/${form.cep.replace("-", "")}/json/`,
-        );
-
-        if (!res.ok) {
-          const err = await res.json();
-          throw err;
-        }
-
-        const data: ViaCEPData = await res.json();
-
-        setForm((st) => ({
-          ...st,
-          logradouro: data.logradouro,
-          bairro: data.bairro,
-          cidade: data.localidade,
-          uf: data.uf,
-        }));
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchViaCEP();
-  }, [form.cep]);
 
   return auth()?.user.nivel === "Super-Admin" ? (
     <form
@@ -413,7 +440,7 @@ export default function SetorCreate() {
               className="rounded-lg bg-indigo-500/60 px-8 py-2 font-bold text-slate-300 shadow shadow-black/20 hover:bg-indigo-500/75 disabled:bg-indigo-400/30 hover:disabled:bg-indigo-400/40"
               disabled={loading}
             >
-              {loading ? "CARREGANDO..." : "CRIAR"}
+              {loading ? "CARREGANDO..." : "SALVAR"}
             </button>
           </div>
         </div>

@@ -23,6 +23,7 @@ import {
   AvatarIcon,
   IdCardIcon,
   BackpackIcon,
+  Pencil2Icon,
 } from "@radix-ui/react-icons";
 
 import { ColumnDef } from "@tanstack/react-table";
@@ -458,6 +459,13 @@ export default function Users() {
                 >
                   <AvatarIcon className="h-5 w-5" />
                 </button>
+                <Link
+                  to={`/users/${user.id}/edit`}
+                  title="Modificar informações do usuário."
+                  className="rounded bg-amber-500/80 p-2 text-blue-50 shadow shadow-black/20 hover:bg-amber-600/80"
+                >
+                  <Pencil2Icon className="h-5 w-5" />
+                </Link>
               </>
             )}
           </div>

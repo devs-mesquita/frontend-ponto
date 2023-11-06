@@ -238,6 +238,35 @@ export default function ConsultarPontos({
           <h2 className="text-center text-slate-200/90">
             Consultar Pontos de {briefUserName}
           </h2>
+          <div className="flex flex-col gap-2 rounded bg-slate-800/80 p-3 text-slate-200/90">
+            <div className="flex flex-col gap-2 md:flex-row md:gap-0">
+              <p className="flex-1">Nome: {user.name}</p>
+              <p className="flex-1">Email: {user.email}</p>
+            </div>
+            <div className="flex flex-col gap-2 md:flex-row md:gap-0">
+              <p className="flex-1">Setor: {user.setor.nome}</p>
+              <p className="flex-1">Nível: {user.nivel}</p>
+            </div>
+            <div className="flex flex-col gap-2 md:flex-row md:gap-0">
+              <p className="flex-1">CPF: {user.cpf}</p>
+            </div>
+            <div className="border-b border-white/90" />
+            <div className="flex flex-col gap-2 md:flex-row md:gap-0">
+              <p className="flex-1">PIS/PASEP: {user.pispasep}</p>
+              <p className="flex-1">CTPS: {user.ctps}</p>
+            </div>
+            <div className="flex flex-col gap-2 md:flex-row md:gap-0">
+              <p className="flex-1">Cargo: {user.cargo}</p>
+              <p className="flex-1">Lotação: {user.lotacao}</p>
+            </div>
+            <div className="flex flex-col gap-2 md:flex-row md:gap-0">
+              <p className="flex-1">
+                Data de Admissão:{" "}
+                {format(new Date(user.data_admissao), "dd/MM/yyyy")}
+              </p>
+              <p className="flex-1">Matrícula: {user.matricula}</p>
+            </div>
+          </div>
           <form
             className="flex flex-col items-center justify-center gap-4 md:flex-row"
             onSubmit={handleSubmitConsulta}
@@ -294,7 +323,7 @@ export default function ConsultarPontos({
               {loading ? "Carregando..." : "Consultar"}
             </button>
           </form>
-          <div className="mx-4 max-h-[72vh] overflow-auto rounded border border-white/20 bg-slate-800 bg-gradient-to-br from-indigo-700/20 to-rose-500/20">
+          <div className="mx-4 max-h-[35vh] overflow-auto rounded border border-white/20 bg-slate-800 bg-gradient-to-br from-indigo-700/20 to-rose-500/20">
             <Table className="relative flex-1 shadow shadow-black/20">
               <TableHeader className="sticky top-0 bg-slate-700 bg-gradient-to-r from-indigo-700/50 to-rose-700/30">
                 <TableRow>
@@ -786,6 +815,7 @@ export default function ConsultarPontos({
                                                 })
                                               : "---"}
                                           </TableCell>
+                                          <TableCell></TableCell>
                                         </>
                                       )}
                                     </>

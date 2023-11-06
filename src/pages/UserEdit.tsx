@@ -1,19 +1,19 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuthUser, useAuthHeader } from "react-auth-kit";
 import InputMask from "react-input-mask";
-import { Navigate } from "react-router-dom";
+import { notificationAtom } from "@/store";
+import { useAtom } from "jotai";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import errorFromApi from "@/utils/errorFromAPI";
+import { UserWithSetor } from "@/types/interfaces";
 
 type Repouso = [boolean, boolean, boolean, boolean, boolean, boolean, boolean];
-type Setor = {
-  id: number;
-  nome: string;
-  soma_entrada: number;
-  soma_saida: number;
-};
 type Message = {
   type: "" | "success" | "error" | "warning";
   message: string;
+};
+type ViewUserAPIResponse = {
+  user: UserWithSetor;
 };
 type RegisterResultado = "created";
 type RegisterAPIResponse = {
@@ -26,7 +26,7 @@ type RegisterAPIResponse = {
 };
 const results = {
   created: {
-    message: "Usuário registrado com sucesso.",
+    message: "Usuário modificado com sucesso.",
     type: "success",
   },
   "cpf-existente": {
@@ -45,13 +45,16 @@ const results = {
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function Register() {
-  document.title = "Registrar Usuário";
+export default function UserEdit() {
+  document.title = "Modificar Usuário";
 
   const auth = useAuthUser();
   const authHeader = useAuthHeader();
 
   const [loading, setLoading] = useState<boolean>(false);
+  const setNotification = useAtom(notificationAtom)[1];
+  const navigate = useNavigate();
+  const { userId } = useParams();
 
   const messageInit: Message = {
     message: "",
@@ -60,11 +63,12 @@ export default function Register() {
   const [message, setMessage] = useState<Message>(messageInit);
 
   const formInit = {
+    user_id: 0,
     email: "",
     cpf: "",
     name: "",
-    setor_id: "",
-    nivel: "",
+    setor_nome: "",
+    nivel_nome: "",
     matricula: "",
     pispasep: "",
     ctps: "",
@@ -97,11 +101,10 @@ export default function Register() {
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
     setMessage(messageInit);
-    setLoading(true);
-    if (form.cpf.length !== 14) return;
 
     try {
-      const res = await fetch(`${API_URL}/api/register`, {
+      setLoading(true);
+      const res = await fetch(`${API_URL}/api/user/update`, {
         method: "POST",
         body: JSON.stringify({
           ...form,
@@ -113,6 +116,7 @@ export default function Register() {
             .replace(".", ""),
           ctps: form.ctps.replace("/", ""),
           repouso,
+          user_id: form.user_id,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -127,9 +131,8 @@ export default function Register() {
       }
 
       const data: RegisterAPIResponse = await res.json();
-      setMessage(results[data.resultado]);
-      setForm(formInit);
-      setLoading(false);
+      setNotification(results[data.resultado]);
+      navigate("/users");
     } catch (error) {
       console.error(error);
       if (error instanceof Error) {
@@ -144,17 +147,14 @@ export default function Register() {
     }
   };
 
-  const [setores, setSetores] = useState<Setor[]>([]);
-
   useEffect(() => {
-    const getSetores = async () => {
+    const getUser = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/setores`, {
-          method: "GET",
+        setLoading(true);
+        const res = await fetch(`${API_URL}/api/user/${userId}`, {
           headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
             Authorization: authHeader(),
+            Accept: "application/json",
           },
         });
 
@@ -163,14 +163,35 @@ export default function Register() {
           throw err;
         }
 
-        const data: { setores: Setor[] } = await res.json();
-        setSetores(data.setores);
+        const { user }: ViewUserAPIResponse = await res.json();
+
+        setForm({
+          user_id: user.id || 0,
+          name: user.name || "",
+          cpf: user.cpf || "",
+          email: user.email || "",
+          cargo: user.cargo || "",
+          ctps: user.ctps || "",
+          lotacao: user.lotacao || "",
+          matricula: user.matricula || "",
+          pispasep: user.pispasep || "",
+          nivel_nome: user.nivel || "",
+          setor_nome: user.setor.nome || "",
+          data_admissao: user.data_admissao?.split(" ")[0] || "",
+        });
+        setRepouso(JSON.parse(user.repouso));
+
+        setLoading(false);
       } catch (error) {
+        setMessage({
+          message: "Ocorreu um erro, atualize a página para tentar novamente.",
+          type: "error",
+        });
         console.error(error);
       }
     };
 
-    getSetores();
+    getUser();
   }, []);
 
   return ["Super-Admin", "Admin"].includes(auth()?.user.nivel || "") ? (
@@ -179,7 +200,7 @@ export default function Register() {
       className="m-4 flex flex-col gap-2 rounded-lg bg-white/5 shadow-md shadow-black/20"
     >
       <h1 className="w-full cursor-default border-b border-white/20 p-3 text-center text-2xl text-slate-300 shadow shadow-black/20">
-        Registrar Usuário
+        Modificar Usuário
       </h1>
       <span className="text-center text-sm text-red-400">
         * Campos marcados com asterisco são obrigatórios.
@@ -229,26 +250,10 @@ export default function Register() {
                 <select
                   id="setor"
                   name="setor_id"
-                  value={form.setor_id}
-                  onChange={handleChange}
                   className="w-full rounded border-2 bg-slate-200 py-1 text-center text-lg text-slate-800 shadow shadow-black/20 outline-0 focus:border-indigo-600/70 disabled:bg-slate-200/40"
-                  disabled={loading}
-                  required
+                  disabled
                 >
-                  {auth()?.user.nivel === "Super-Admin" ? (
-                    <>
-                      <option value="">Selecione um setor</option>
-                      {setores.map((setor) => (
-                        <option key={crypto.randomUUID()} value={setor.id}>
-                          {setor.nome}
-                        </option>
-                      ))}
-                    </>
-                  ) : (
-                    <option value={auth()?.user.setor.id}>
-                      {auth()?.user.setor.nome}
-                    </option>
-                  )}
+                  <option>{form.setor_nome}</option>
                 </select>
               </div>
               <div className="flex w-full flex-col gap-1">
@@ -258,18 +263,14 @@ export default function Register() {
                 <select
                   id="nivel"
                   name="nivel"
-                  value={form.nivel}
-                  onChange={handleChange}
                   className="w-full rounded border-2 bg-slate-200 py-1 text-center text-lg text-slate-800 shadow shadow-black/20 outline-0 focus:border-indigo-600/70 disabled:bg-slate-200/40"
-                  disabled={loading}
-                  required
+                  disabled
+                  value={form.nivel_nome}
                 >
-                  <option value="">Selecione um nível</option>
-                  {auth()?.user.nivel === "Super-Admin" && (
-                    <option value="Super-Admin">Super Administrador</option>
-                  )}
-                  <option value="Admin">Administrador</option>
+                  <option value=""></option>
                   <option value="User">Usuário</option>
+                  <option value="Admin">Administrador</option>
+                  <option value="Super-Admin">Super Administrador</option>
                 </select>
               </div>
             </div>
@@ -410,7 +411,7 @@ export default function Register() {
                     id="domingo"
                     name="domingo"
                     type="checkbox"
-                    defaultChecked={repouso[0]}
+                    checked={repouso[0]}
                     onChange={() => {
                       setRepouso((st) => {
                         return st.map((v, i) => {
@@ -429,7 +430,7 @@ export default function Register() {
                     id="segunda_feira"
                     name="segunda_feira"
                     type="checkbox"
-                    defaultChecked={repouso[1]}
+                    checked={repouso[1]}
                     onChange={() => {
                       setRepouso((st) => {
                         return st.map((v, i) => {
@@ -448,7 +449,7 @@ export default function Register() {
                     id="terca_feira"
                     name="terca_feira"
                     type="checkbox"
-                    defaultChecked={repouso[2]}
+                    checked={repouso[2]}
                     onChange={() => {
                       setRepouso((st) => {
                         return st.map((v, i) => {
@@ -467,7 +468,7 @@ export default function Register() {
                     id="quarta_feira"
                     name="quarta_feira"
                     type="checkbox"
-                    defaultChecked={repouso[3]}
+                    checked={repouso[3]}
                     onChange={() => {
                       setRepouso((st) => {
                         return st.map((v, i) => {
@@ -486,7 +487,7 @@ export default function Register() {
                     id="quinta_feira"
                     name="quinta_feira"
                     type="checkbox"
-                    defaultChecked={repouso[4]}
+                    checked={repouso[4]}
                     onChange={() => {
                       setRepouso((st) => {
                         return st.map((v, i) => {
@@ -505,7 +506,7 @@ export default function Register() {
                     id="sexta_feira"
                     name="sexta_feira"
                     type="checkbox"
-                    defaultChecked={repouso[5]}
+                    checked={repouso[5]}
                     onChange={() => {
                       setRepouso((st) => {
                         return st.map((v, i) => {
@@ -524,7 +525,7 @@ export default function Register() {
                     id="sabado"
                     name="sabado"
                     type="checkbox"
-                    defaultChecked={repouso[6]}
+                    checked={repouso[6]}
                     onChange={() => {
                       setRepouso((st) => {
                         return st.map((v, i) => {
@@ -563,7 +564,7 @@ export default function Register() {
               className="rounded-lg bg-indigo-500/60 px-8 py-2 font-bold text-slate-300 shadow shadow-black/20 hover:bg-indigo-500/75 disabled:bg-indigo-400/30 hover:disabled:bg-indigo-400/40"
               disabled={loading}
             >
-              {loading ? "CARREGANDO..." : "REGISTRAR"}
+              {loading ? "CARREGANDO..." : "SALVAR"}
             </button>
           </div>
         </div>

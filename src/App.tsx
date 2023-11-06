@@ -13,6 +13,8 @@ import Users from "./pages/Users";
 import Exports from "./pages/Exports";
 import Setores from "./pages/Setores";
 import SetorCreate from "./pages/SetorCreate";
+import SetorEdit from "./pages/SetorEdit";
+import UserEdit from "./pages/UserEdit";
 
 export default function App() {
   return (
@@ -89,6 +91,22 @@ export default function App() {
             element={
               <RequireAuth loginPath="/login">
                 <SetorCreate />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="setores/:setorId/edit"
+            element={
+              <RequireAuth loginPath="/login">
+                <SetorEdit />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="users/:userId/edit"
+            element={
+              <RequireAuth loginPath="/login">
+                <UserEdit />
               </RequireAuth>
             }
           />

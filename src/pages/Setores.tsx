@@ -5,6 +5,11 @@ import { notificationAtom } from "@/store";
 import { Link, Navigate } from "react-router-dom";
 
 import type { Setor } from "@/types/interfaces";
+import ViewSetor from "@/components/SetorActions/ViewSetor";
+
+type ViewSetorPopup = {
+  close: () => void;
+} & ({ isOpen: true; setor: Setor } | { isOpen: false; setor: undefined });
 
 import {
   MagnifyingGlassIcon,
@@ -28,6 +33,20 @@ export default function Setores() {
   const [loading, setLoading] = React.useState<boolean>(false);
   const setNotification = useAtom(notificationAtom)[1];
   const [setores, setSetores] = React.useState<Setor[]>([]);
+
+  const viewSetorInitialState: ViewSetorPopup = {
+    isOpen: false,
+    close: () => {
+      setViewSetor((st) => ({ ...st, setor: undefined, isOpen: false }));
+    },
+    setor: undefined,
+  };
+  const [consultarPontos, setViewSetor] = React.useState<ViewSetorPopup>(
+    viewSetorInitialState,
+  );
+  const handlePopupConsultarPontos = (setor: Setor) => {
+    setViewSetor((st) => ({ ...st, setor, isOpen: true }));
+  };
 
   React.useEffect(() => {
     const getSetores = async () => {
@@ -78,40 +97,6 @@ export default function Setores() {
         </div>
       ),
     },
-    /* {
-      accessorKey: "cnpj",
-      header: ({ column }) => (
-        <div className="text-center">
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            CNPJ
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
-      ),
-      cell: ({ row }) => (
-        <div className="text-center">{row.getValue("cnpj")}</div>
-      ),
-    },
-    {
-      accessorKey: "empresa",
-      header: ({ column }) => (
-        <div className="text-center">
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Empresa
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
-      ),
-      cell: ({ row }) => (
-        <div className="text-center">{row.getValue("empresa")}</div>
-      ),
-    }, */
     {
       id: "actions",
       header: () => <div className="text-center">Ações</div>,
@@ -123,18 +108,17 @@ export default function Setores() {
               disabled={loading}
               title="Visualizar setor."
               className="rounded bg-cyan-500/80 p-2 text-blue-50 shadow shadow-black/20 hover:bg-cyan-600/80"
-              // onClick={() => handlePopupViewSetor(setor)}
+              onClick={() => handlePopupConsultarPontos(setor)}
             >
               <MagnifyingGlassIcon className="h-5 w-5" />
             </button>
-            <button
-              disabled={loading}
+            <Link
+              to={`/setores/${setor.id}/edit`}
               title="Modificar setor."
               className="rounded bg-yellow-500/80 p-2 text-blue-50 shadow shadow-black/20 hover:bg-yellow-600/80"
-              // onClick={() => handlePopupEditSetor(setor)}
             >
               <Pencil2Icon className="h-5 w-5" />
-            </button>
+            </Link>
           </div>
         );
       },
@@ -165,6 +149,12 @@ export default function Setores() {
           />
         </div>
       </div>
+      {consultarPontos.isOpen && (
+        <ViewSetor
+          setor={consultarPontos.setor}
+          closePopup={consultarPontos.close}
+        />
+      )}
     </>
   ) : (
     <Navigate to="/" />
