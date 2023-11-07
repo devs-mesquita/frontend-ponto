@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { format, addHours } from "date-fns";
+import { format, addHours, addDays, differenceInDays } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
 
 import { UserWithSetor } from "@/types/interfaces";
@@ -23,32 +23,78 @@ export default function (
   user: UserWithSetor,
   date: { from: Date; to: Date },
 ) {
-  const doc = new jsPDF();
   const fromDate = format(date.from, "dd/MM/yyyy");
   const toDate = format(date.to, "dd/MM/yyyy");
-
+  
   const cpfWithSymbols = `${user.cpf.slice(0, 3)}.${user.cpf.slice(
     3,
     6,
-  )}.${user.cpf.slice(6, 9)}-${user.cpf.slice(9)}`;
-
+    )}.${user.cpf.slice(6, 9)}-${user.cpf.slice(9)}`;
+    
+    const startDate = date.from;
+  const endDate = date.to;
+  const daysQuantity = differenceInDays(endDate, startDate) + 1;
+  const dates = Array.from({ length: daysQuantity }, (_value, index) => {
+    return format(addDays(startDate, index), "yyyy-MM-dd", {
+      locale: ptBR,
+    });
+  });
+  
+  const doc = new jsPDF();
+  
+  doc.setFont("Helvetica", "normal", "bold");
   doc.setFontSize(12);
   doc.text(
     `PLANILHA DE HORÁRIOS POR TRABALHADOR DE ${fromDate} A ${toDate}`,
     doc.internal.pageSize.width / 2,
-    10,
+    5,
     {
       align: "center",
     },
   );
   doc.setFontSize(10);
-  doc.text(`NOME: ${user.name.toUpperCase()}`, 15, 18, {});
-  doc.text(`SETOR: ${user.setor.nome}`, 15, 24);
-  doc.text(`CPF: ${cpfWithSymbols}`, 15, 30);
-  // doc.text(`LINHA 4: TESTE DE ESPAÇO`, 15, 36);
+  doc.text(`NOME: ${user.name.toUpperCase()}`, 15, 12);
+  doc.text(`SETOR: ${user.setor.nome}`, 15, 18);
+  doc.text(`CARGO: ${user.cargo}`, 15, 24);
+  doc.text(`LOTAÇÃO: ${user.lotacao}`, 15, 30);
+  doc.text(`EMPRESA: ${user.setor.empresa}`, 15, 36);
+
+  doc.text(`CPF: ${cpfWithSymbols}`, doc.internal.pageSize.width * 0.73, 12);
+  doc.text(
+    `PISPASEP: ${user.pispasep}`,
+    doc.internal.pageSize.width * 0.73,
+    18,
+  );
+  doc.text(`CTPS: ${user.ctps}`, doc.internal.pageSize.width * 0.73, 24);
+  doc.text(
+    `ADMISSÃO: ${
+      user.data_admissao
+        ? format(new Date(user.data_admissao), "dd/MM/yyyy")
+        : ""
+    }`,
+    doc.internal.pageSize.width * 0.73,
+    30,
+  );
+
+  const repousoArr = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SAB"];
+  const userRepousoArr: boolean[] | null = JSON.parse(user.repouso);
+
+  let repousoStr = "";
+  if (userRepousoArr) {
+    repousoStr = `${userRepousoArr
+      .map((v, i) => {
+        if (v) {
+          return repousoArr[i];
+        }
+      })
+      .filter((v) => v)
+      .join(", ")}.`;
+  }
+  doc.text(`REPOUSO: ${repousoStr}`, doc.internal.pageSize.width * 0.73, 36);
 
   autoTable(doc, {
     startY: 40,
+    columnStyles: { 0: { halign: "left" } },
     headStyles: {
       fillColor: [30, 30, 30],
       halign: "center",
@@ -59,7 +105,7 @@ export default function (
     head: [
       ["DATA", "ENTRADA", "INÍCIO DE INTERVALO", "FIM DE INTERVALO", "SAÍDA"],
     ],
-    body: Object.keys(registrosTable).map((dateKey) => {
+    body: dates.map((dateKey) => {
       const pontoDate = format(
         new Date(`${dateKey} 12:00:00`),
         "dd/MM - EEEEEE",
