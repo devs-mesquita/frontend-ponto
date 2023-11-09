@@ -25,13 +25,13 @@ export default function (
 ) {
   const fromDate = format(date.from, "dd/MM/yyyy");
   const toDate = format(date.to, "dd/MM/yyyy");
-  
+
   const cpfWithSymbols = `${user.cpf.slice(0, 3)}.${user.cpf.slice(
     3,
     6,
-    )}.${user.cpf.slice(6, 9)}-${user.cpf.slice(9)}`;
-    
-    const startDate = date.from;
+  )}.${user.cpf.slice(6, 9)}-${user.cpf.slice(9)}`;
+
+  const startDate = date.from;
   const endDate = date.to;
   const daysQuantity = differenceInDays(endDate, startDate) + 1;
   const dates = Array.from({ length: daysQuantity }, (_value, index) => {
@@ -39,9 +39,9 @@ export default function (
       locale: ptBR,
     });
   });
-  
+
   const doc = new jsPDF();
-  
+
   doc.setFont("Helvetica", "normal", "bold");
   doc.setFontSize(12);
   doc.text(
@@ -53,11 +53,11 @@ export default function (
     },
   );
   doc.setFontSize(10);
-  doc.text(`NOME: ${user.name.toUpperCase()}`, 15, 12);
-  doc.text(`SETOR: ${user.setor.nome}`, 15, 18);
-  doc.text(`CARGO: ${user.cargo}`, 15, 24);
-  doc.text(`LOTAÇÃO: ${user.lotacao}`, 15, 30);
-  doc.text(`EMPRESA: ${user.setor.empresa}`, 15, 36);
+  doc.text(`NOME: ${user.name.toUpperCase()}`.slice(0, 55), 15, 12);
+  doc.text(`SETOR: ${user.setor.nome}`.slice(0, 55), 15, 18);
+  doc.text(`CARGO: ${user.cargo}`.slice(0, 55), 15, 24);
+  doc.text(`LOTAÇÃO: ${user.lotacao}`.slice(0, 55), 15, 30);
+  doc.text(`EMPRESA: ${user.setor.empresa}`.slice(0, 55), 15, 36);
 
   doc.text(`CPF: ${cpfWithSymbols}`, doc.internal.pageSize.width * 0.73, 12);
   doc.text(
