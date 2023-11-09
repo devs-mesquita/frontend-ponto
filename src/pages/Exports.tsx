@@ -278,7 +278,7 @@ export default function Exports() {
           </PopoverContent>
         </Popover>
       </div>
-      <div className="m-4 mt-8 flex flex-1 flex-col items-center justify-around rounded border p-8 md:flex-row md:items-start">
+      <div className="m-4 mt-8 flex flex-col items-center justify-around rounded p-8 md:flex-row md:items-start">
         <form
           className="flex flex-col items-center justify-center gap-4"
           onSubmit={handleSubmitExportUserPontos}
