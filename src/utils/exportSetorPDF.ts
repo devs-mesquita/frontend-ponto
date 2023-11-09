@@ -114,11 +114,11 @@ export default function (
       },
     );
     doc.setFontSize(10);
-    doc.text(`NOME: ${user.name.toUpperCase()}`.slice(0, 55), 15, 12, {});
-    doc.text(`SETOR: ${user.setor.nome}`.slice(0, 55), 15, 18);
-    doc.text(`CARGO: ${user.cargo}`.slice(0, 55), 15, 24);
-    doc.text(`LOTAÇÃO: ${user.lotacao}`.slice(0, 55), 15, 30);
-    doc.text(`EMPRESA: ${user.setor.empresa}`.slice(0, 55), 15, 36);
+    doc.text(`NOME: ${user.name.toUpperCase()}`.slice(0, 59), 15, 12, {});
+    doc.text(`SETOR: ${user.setor.nome}`.slice(0, 59), 15, 18);
+    doc.text(`CARGO: ${user.cargo}`.slice(0, 59), 15, 24);
+    doc.text(`LOTAÇÃO: ${user.lotacao}`.slice(0, 59), 15, 30);
+    doc.text(`EMPRESA: ${user.setor.empresa}`.slice(0, 59), 15, 36);
 
     doc.text(`CPF: ${cpfWithSymbols}`, doc.internal.pageSize.width * 0.73, 12);
     doc.text(
