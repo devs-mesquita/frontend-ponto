@@ -483,7 +483,7 @@ export default function Users() {
             className="flex flex-1 flex-col items-center justify-center gap-2"
             onSubmit={handleConsulta}
           >
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col items-center gap-4 md:flex-row">
               <h2 className="text-center text-slate-200/90">Setor:</h2>
               <select
                 className="rounded border-2 bg-white px-2 py-1 text-slate-800 shadow shadow-black/20 outline-0 focus:border-indigo-600/70 disabled:bg-slate-200/40 hover:disabled:cursor-wait"

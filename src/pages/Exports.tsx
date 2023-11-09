@@ -286,7 +286,7 @@ export default function Exports() {
           <h1 className="text-center text-slate-200/90">
             Pontos por Usuário (CPF)
           </h1>
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex flex-col items-center justify-center gap-3 md:flex-row">
             <InputMask
               autoComplete="off"
               name="cpf"
@@ -314,7 +314,7 @@ export default function Exports() {
           onSubmit={handleSubmitExportSetorPontos}
         >
           <h1 className="text-center text-slate-200/90">Pontos por Setor</h1>
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex flex-col items-center justify-center gap-3 md:flex-row">
             <select
               className="rounded border-2 bg-white px-2 py-1 text-slate-800 shadow shadow-black/20 outline-0 focus:border-indigo-600/70 disabled:bg-slate-200/40"
               disabled={loading}

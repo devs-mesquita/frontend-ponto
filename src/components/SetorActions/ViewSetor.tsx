@@ -9,7 +9,7 @@ type ViewSetorProps = {
 export default function ViewSetor({ closePopup, setor }: ViewSetorProps) {
   return ReactDOM.createPortal(
     <>
-      <div className="fixed left-1/2 top-1/2 z-30 flex w-[28rem] translate-x-[-50%] translate-y-[-50%] flex-col gap-3 rounded bg-slate-700 bg-gradient-to-br from-indigo-500/40 to-rose-500/40 p-3 md:w-[45rem] lg:w-[60rem]">
+      <div className="fixed max-w-[90vw] left-1/2 top-1/2 z-30 flex w-[28rem] translate-x-[-50%] translate-y-[-50%] flex-col gap-3 rounded bg-slate-700 bg-gradient-to-br from-indigo-500/40 to-rose-500/40 p-3 md:w-[45rem] lg:w-[60rem]">
         <h2 className="mx-auto rounded bg-slate-800/80 px-4 py-1 text-center text-slate-200/90">
           {setor.nome}
         </h2>
